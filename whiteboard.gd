@@ -6,6 +6,12 @@ var point_position: PackedVector2Array = []
 var point_check: PackedVector2Array = []
 
 func _input(event):
+	handle_drawing(event)
+
+func handle_drawing(event):
+	if (event is not InputEventMouseButton) and (event is not InputEventMouseMotion):
+		return
+	
 	var curr_position = event.position - (get_viewport_rect().size / 2)
 	if event is InputEventMouseButton:
 		drawing = event.is_pressed()
@@ -23,6 +29,7 @@ func _input(event):
 		point_position = []
 		point_check = []
 		queue_redraw()
+	
 
 func _draw():
 	if len(point_position) < 1:
