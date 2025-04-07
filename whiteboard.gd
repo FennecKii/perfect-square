@@ -45,15 +45,15 @@ func _draw():
 		return
 		
 	if len(point_position) == 1:
-		draw_circle(point_position[0], 10, Color.BLACK)
+		draw_circle(point_position[0], 5, Color.BLACK)
 	else:
-		draw_polyline(point_position, Color.BLACK, 10, true)
+		draw_polyline(point_position, Color.BLACK, 5, true)
 		
 func handle_outline():
 	draw_circle(Vector2(0, 0), 3, Color.CADET_BLUE)
 	if not point_position:
 		return
-	var dist_to_draw = max(abs(point_position[0].y), abs(point_position[0].x))
+	var dist_to_draw = min(half_screen_rect.y, max(abs(point_position[0].y), abs(point_position[0].x)))
 	
 	draw_dashed_line(Vector2(0, 0), Vector2(0, dist_to_draw), Color.CADET_BLUE, 3, 20, true, true)
 	draw_dashed_line(Vector2(0, 0), Vector2(0, -dist_to_draw), Color.CADET_BLUE, 3, 20, true, true)
