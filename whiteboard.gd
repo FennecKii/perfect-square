@@ -6,7 +6,6 @@ var point_position: PackedVector2Array = []
 var point_check: PackedVector2Array = []
 
 func _input(event):
-	# This function handles drawing on the canvas
 	handle_drawing(event)
 
 func handle_drawing(event):
