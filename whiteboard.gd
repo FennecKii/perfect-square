@@ -53,12 +53,10 @@ func handle_outline():
 	draw_circle(Vector2(0, 0), 3, Color.CADET_BLUE)
 	if not point_position:
 		return
-	var dist_to_draw = min(half_screen_rect.y, max(abs(point_position[0].y), abs(point_position[0].x)))
+	var dist_to_draw = min(half_screen_rect.y, compute_pretrace_square(point_position[0]).size.x / 2)
 	
-	draw_dashed_line(Vector2(0, 0), Vector2(0, dist_to_draw), Color.CADET_BLUE, 3, 20, true, true)
-	draw_dashed_line(Vector2(0, 0), Vector2(0, -dist_to_draw), Color.CADET_BLUE, 3, 20, true, true)
-	draw_dashed_line(Vector2(0, 0), Vector2(dist_to_draw, 0), Color.CADET_BLUE, 3, 20, true, true)
-	draw_dashed_line(Vector2(0, 0), Vector2(-dist_to_draw, 0), Color.CADET_BLUE, 3, 20, true, true)
+	draw_dashed_line(Vector2(0, -dist_to_draw), Vector2(0, dist_to_draw), Color.CADET_BLUE, 3, 20, true, true)
+	draw_dashed_line(Vector2(-dist_to_draw, 0), Vector2(dist_to_draw, 0), Color.CADET_BLUE, 3, 20, true, true)
 
 func vec_len(x: float, y: float) -> float:
 	return sqrt(x**2 + y**2)
