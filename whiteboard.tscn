@@ -7,10 +7,18 @@ script = ExtResource("1_ihy0m")
 
 [node name="ColorRect" type="ColorRect" parent="."]
 z_index = -1
-offset_left = -15.0
-offset_top = -15.0
-offset_right = 1156.0
-offset_bottom = 655.0
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -585.5
+offset_top = -335.0
+offset_right = 585.5
+offset_bottom = 335.0
+grow_horizontal = 2
+grow_vertical = 2
+size_flags_horizontal = 4
+size_flags_vertical = 4
 
 [node name="Camera2D" type="Camera2D" parent="."]
-position = Vector2(573, 323)
