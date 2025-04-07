@@ -5,6 +5,13 @@ var point_spacing: float = 20
 var point_position: PackedVector2Array = []
 var point_check: PackedVector2Array = []
 
+@onready
+var half_screen_rect = get_viewport_rect().size / 2
+
+func _ready():
+	queue_redraw()
+	
+
 func _input(event):
 	handle_drawing(event)
 
@@ -12,7 +19,7 @@ func handle_drawing(event):
 	if (event is not InputEventMouseButton) and (event is not InputEventMouseMotion):
 		return
 	
-	var curr_position = event.position - (get_viewport_rect().size / 2)
+	var curr_position = event.position - half_screen_rect
 	if event is InputEventMouseButton:
 		drawing = event.is_pressed()
 		point_position.append(curr_position)
@@ -32,6 +39,8 @@ func handle_drawing(event):
 	
 
 func _draw():
+	handle_outline()
+	
 	if len(point_position) < 1:
 		return
 		
@@ -39,6 +48,17 @@ func _draw():
 		draw_circle(point_position[0], 10, Color.BLACK)
 	else:
 		draw_polyline(point_position, Color.BLACK, 10, true)
+		
+func handle_outline():
+	draw_circle(Vector2(0, 0), 3, Color.CADET_BLUE)
+	if not point_position:
+		return
+	var dist_to_draw = max(abs(point_position[0].y), abs(point_position[0].x))
+	
+	draw_dashed_line(Vector2(0, 0), Vector2(0, dist_to_draw), Color.CADET_BLUE, 3, 20, true, true)
+	draw_dashed_line(Vector2(0, 0), Vector2(0, -dist_to_draw), Color.CADET_BLUE, 3, 20, true, true)
+	draw_dashed_line(Vector2(0, 0), Vector2(dist_to_draw, 0), Color.CADET_BLUE, 3, 20, true, true)
+	draw_dashed_line(Vector2(0, 0), Vector2(-dist_to_draw, 0), Color.CADET_BLUE, 3, 20, true, true)
 
 func vec_len(x: float, y: float) -> float:
 	return sqrt(x**2 + y**2)
