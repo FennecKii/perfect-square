@@ -62,3 +62,10 @@ func handle_outline():
 
 func vec_len(x: float, y: float) -> float:
 	return sqrt(x**2 + y**2)
+
+func compute_pretrace_square(init_pos: Vector2) -> Rect2:
+	var perfect_square: Rect2
+	var square_len: float = 2 * max(abs(init_pos.x), abs(init_pos.y))
+	perfect_square.position = Vector2(-square_len / 2, -square_len / 2)
+	perfect_square.size = Vector2(square_len, square_len)
+	return perfect_square
