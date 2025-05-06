@@ -19,7 +19,7 @@ func _ready():
 	queue_redraw()
 
 func _process(_delta):
-	score_label.text = str(similarity_score)
+	score_label.text = str(str("%0.2f" % similarity_score,"%")) if similarity_score > 0 else 'X.X%'
 
 func _input(event):
 	handle_drawing(event)
