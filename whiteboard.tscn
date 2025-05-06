@@ -1,7 +1,9 @@
-[gd_scene load_steps=3 format=3 uid="uid://cj881scupmcst"]
+[gd_scene load_steps=5 format=3 uid="uid://cj881scupmcst"]
 
 [ext_resource type="Script" uid="uid://dveesddjx3uhj" path="res://whiteboard.gd" id="1_ihy0m"]
 [ext_resource type="Curve" uid="uid://de73cvwww280o" path="res://distrance_curve.tres" id="2_tyhvn"]
+[ext_resource type="Theme" uid="uid://bcb6jx2yuewkc" path="res://ui_default_theme.tres" id="3_c7jcs"]
+[ext_resource type="PackedScene" uid="uid://31catl2ugpea" path="res://ui.tscn" id="4_4ykqq"]
 
 [node name="Whiteboard" type="Node2D"]
 script = ExtResource("1_ihy0m")
@@ -26,12 +28,17 @@ size_flags_vertical = 4
 [node name="Camera2D" type="Camera2D" parent="."]
 
 [node name="Label" type="Label" parent="."]
-offset_left = -64.0
-offset_top = -42.0
-offset_right = 65.0
-offset_bottom = 42.0
-theme_override_colors/font_color = Color(0, 0, 0, 1)
-theme_override_font_sizes/font_size = 25
+offset_left = -56.0
+offset_top = -22.0
+offset_right = 56.0
+offset_bottom = 21.3333
+theme = ExtResource("3_c7jcs")
+theme_override_font_sizes/font_size = 40
 text = "0"
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="UI" parent="." instance=ExtResource("4_4ykqq")]
+offset_top = 43.0
+offset_right = 10.0
+offset_bottom = 53.0
