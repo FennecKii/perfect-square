@@ -40,8 +40,6 @@ func handle_drawing(event):
 	if event is InputEventMouseMotion and drawing:
 		if vec_len(curr_position.x - point_check[len(point_check) - 1].x, curr_position.y - point_check[len(point_check) - 1].y) >= point_spacing:
 			point_check.append(curr_position)
-			print(event.position)
-			print(curr_position)
 			similarity_score = compute_similarity(point_check, pretrace_pos_array, similarity_score)
 		point_position.append(curr_position)
 		queue_redraw()
