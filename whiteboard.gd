@@ -4,7 +4,7 @@ extends Node2D
 var distance_curve: Curve
 
 var drawing: bool = false
-var point_spacing: float = 5
+var point_spacing: float = 0.1
 var point_position: PackedVector2Array = []
 var point_check: PackedVector2Array = []
 var pretrace_pos_array: Array[Vector2] = []
@@ -19,7 +19,7 @@ func _ready():
 	queue_redraw()
 
 func _process(_delta):
-	score_label.text = str(roundf(similarity_score))
+	score_label.text = str(similarity_score)
 
 func _input(event):
 	handle_drawing(event)
