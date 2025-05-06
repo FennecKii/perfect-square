@@ -1,6 +1,7 @@
 extends Node2D
 
-@export var distance_curve: Curve
+@export 
+var distance_curve: Curve
 
 var drawing: bool = false
 var point_spacing: float = 5
@@ -11,9 +12,14 @@ var similarity_score: float
 
 @onready
 var half_screen_rect = get_viewport_rect().size / 2
+@onready 
+var score_label = $Label
 
 func _ready():
 	queue_redraw()
+
+func _process(_delta):
+	score_label.text = str(roundf(similarity_score))
 
 func _input(event):
 	handle_drawing(event)
@@ -117,8 +123,4 @@ func compute_similarity(point_check_array: Array[Vector2], pretrace_pos_array: A
 	else:
 		point_accuracy_weight = (point_array_size/(point_array_size-point_array_size/6))/point_array_size
 		past_accuracy_weight = 1 - point_accuracy_weight
-	print("Array Size: ", point_array_size, ", Past Acc Array Weight: ", past_accuracy_weight, ", Point Acc Array Weight: ", point_accuracy_weight)
-	print("Past Acc: ", past_accuracy, ", Past Acc Weight Adjusted: ", (past_accuracy * past_accuracy_weight))
-	print("Min Dorff Distance: ", dorff_distance.min(), ", Point Acc: ", point_accuracy, ", Point Acc Weight Agjusted: ", (point_accuracy * point_accuracy_weight))
-	print("New Similarity: ", (past_accuracy * past_accuracy_weight) + (point_accuracy * point_accuracy_weight))
 	return (past_accuracy * past_accuracy_weight) + (point_accuracy * point_accuracy_weight)
