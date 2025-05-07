@@ -27,11 +27,11 @@ size_flags_vertical = 4
 
 [node name="Camera2D" type="Camera2D" parent="."]
 
-[node name="Label" type="Label" parent="."]
-offset_left = -56.0
-offset_top = -22.0
-offset_right = 56.0
-offset_bottom = 21.3333
+[node name="Score" type="Label" parent="."]
+offset_left = -55.0
+offset_top = -66.0
+offset_right = 57.0
+offset_bottom = -22.6667
 theme = ExtResource("3_c7jcs")
 theme_override_font_sizes/font_size = 40
 text = "0"
@@ -42,3 +42,15 @@ vertical_alignment = 1
 offset_top = 43.0
 offset_right = 10.0
 offset_bottom = 53.0
+
+[node name="Title(RGB)" type="Label" parent="."]
+offset_left = -109.0
+offset_top = -323.0
+offset_right = 110.0
+offset_bottom = -279.667
+theme = ExtResource("3_c7jcs")
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_font_sizes/font_size = 40
+text = "Perfect Square"
+horizontal_alignment = 1
+vertical_alignment = 1
