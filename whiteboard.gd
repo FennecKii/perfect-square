@@ -97,9 +97,9 @@ func get_pretrace_array(pretrace_square: Rect2, size: int):
 	
 	for i in range(0, size):
 		pretrace_pos_array.append(Vector2(pretrace_vertex_pos[0].x + i*pos_discrim, pretrace_vertex_pos[0].y))
-		pretrace_pos_array.append(Vector2(pretrace_vertex_pos[3].x + i*pos_discrim, pretrace_vertex_pos[3].y))
-		pretrace_pos_array.append(Vector2(pretrace_vertex_pos[0].x, pretrace_vertex_pos[0].y + i*pos_discrim))
+		pretrace_pos_array.append(Vector2(pretrace_vertex_pos[2].x - i*pos_discrim, pretrace_vertex_pos[2].y))
 		pretrace_pos_array.append(Vector2(pretrace_vertex_pos[1].x, pretrace_vertex_pos[1].y + i*pos_discrim))
+		pretrace_pos_array.append(Vector2(pretrace_vertex_pos[3].x, pretrace_vertex_pos[3].y - i*pos_discrim))
 	return pretrace_pos_array
 
 func compute_similarity(point_check_array: Array[Vector2], pretrace_pos_array: Array[Vector2], past_accuracy: float):
