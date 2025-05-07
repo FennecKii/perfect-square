@@ -126,8 +126,8 @@ func handle_drawing(event):
 
 func _draw():
 	#handle_outline()
-	draw_circle(Vector2(0,0), 7, Color.BLACK, false, 8, true)
-	draw_circle(Vector2(0,0), 8, final_animated_color, true, 8, true)
+	draw_circle(Vector2(0,0), 7, Color.BLACK, false)
+	draw_circle(Vector2(0,0), 8, final_animated_color, true)
 	
 	draw_style_box(boundary_stylebox, drawing_bound)
 	
@@ -146,7 +146,7 @@ func _draw():
 		curr_position = point_position[len(point_position)-1]
 	
 	if len(point_position_color) > 0:
-		draw_circle(curr_position, 7, point_position_color[len(point_position_color)-1], true, 7, true)
+		draw_circle(curr_position, 7, point_position_color[len(point_position_color)-1], true)
 	#if len(pretrace_pos_array) > 1:
 	#	for point in pretrace_pos_array:
 	#		draw_circle(point, 5, Color.REBECCA_PURPLE, true)
@@ -198,12 +198,12 @@ func compute_similarity(point_check_array: Array[Vector2], pretrace_pos_array: A
 		dorff_distance.append(vec_len(dorff_distance_vector.x , dorff_distance_vector.y))
 	point_accuracy = 100 * distance_curve.sample(dorff_distance.min())
 	if point_accuracy >= 90.0:
-		point_accuracy_weight = (point_array_size/(point_array_size * 0.95))/point_array_size
+		point_accuracy_weight = (point_array_size/(point_array_size * 0.99))/point_array_size
 		past_accuracy_weight = 1 - point_accuracy_weight
 	elif 60.0 <= point_accuracy and point_accuracy <= 90.0:
 		point_accuracy_weight = (point_array_size/(point_array_size * 0.25))/point_array_size
 		past_accuracy_weight = 1 - point_accuracy_weight
 	else:
-		point_accuracy_weight = (point_array_size/(point_array_size * 0.05))/point_array_size
+		point_accuracy_weight = (point_array_size/(point_array_size * 0.1))/point_array_size
 		past_accuracy_weight = 1 - point_accuracy_weight
 	return Vector2((past_accuracy * past_accuracy_weight) + (point_accuracy * point_accuracy_weight), point_accuracy) 

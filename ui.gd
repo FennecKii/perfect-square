@@ -5,8 +5,6 @@ var lose_label = $"Game Lose"
 @onready
 var win_label = $"Game Win"
 @onready
-var neg_feedback_label = $"Negative Feedback"
-@onready
 var game_start_label = $"Game Start"
 
 func _ready():
