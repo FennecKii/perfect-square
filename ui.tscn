@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3 uid="uid://31catl2ugpea"]
+[gd_scene load_steps=3 format=3 uid="uid://31catl2ugpea"]
 
 [ext_resource type="Theme" uid="uid://bcb6jx2yuewkc" path="res://ui_default_theme.tres" id="1_fyqef"]
+[ext_resource type="Script" uid="uid://c6cbqx3p6m786" path="res://ui.gd" id="1_m6e0p"]
 
 [node name="UI" type="Control"]
 custom_minimum_size = Vector2(10, 10)
@@ -12,6 +13,7 @@ offset_right = -1142.0
 offset_bottom = -638.0
 grow_horizontal = 2
 grow_vertical = 2
+script = ExtResource("1_m6e0p")
 
 [node name="Game Lose" type="Label" parent="."]
 visible = false

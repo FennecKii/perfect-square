@@ -49,6 +49,7 @@ func handle_drawing(event):
 		point_check = []
 		pretrace_pos_array = []
 		similarity_score = 0
+		SignalBus.reset_ui.emit()
 		queue_redraw()
 
 func _draw():

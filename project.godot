@@ -15,6 +15,10 @@ run/main_scene="uid://cj881scupmcst"
 config/features=PackedStringArray("4.4", "GL Compatibility")
 config/icon="res://icon.svg"
 
+[autoload]
+
+SignalBus="*res://signal_bus.gd"
+
 [display]
 
 window/stretch/mode="canvas_items"
