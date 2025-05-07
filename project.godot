@@ -21,6 +21,7 @@ SignalBus="*res://signal_bus.gd"
 
 [display]
 
+window/size/mode=2
 window/stretch/mode="viewport"
 
 [input]
