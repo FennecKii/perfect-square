@@ -14,7 +14,7 @@ var drawing_bound: Rect2
 var drawing_bound_small: Rect2
 var time: float = 0.0
 var text_speed: float = 1.0
-var text_saturation_factor: float = 0.3
+var text_saturation_factor: float = 0.6
 var curr_position: Vector2
 var final_animated_color: Color
 
@@ -24,6 +24,8 @@ var half_screen_rect = get_viewport_rect().size / 2
 var score_label = $Score
 @onready
 var title = $"Title(RGB)"
+@onready
+var camera = $Camera
 @onready
 var boundary_stylebox = preload("res://stylebox_boundary.tres")
 @onready
@@ -73,7 +75,7 @@ func handle_drawing(event):
 	if (event is not InputEventMouseButton) and (event is not InputEventMouseMotion):
 		return
 	
-	curr_position = event.position - half_screen_rect
+	curr_position = event.position - half_screen_rect + Vector2(0, camera.position.y)
 	
 	if !drawing_bound.has_point(curr_position) and not drawing and Input.is_action_just_pressed("Draw"):
 		SignalBus.game_lose.emit(3)
@@ -126,13 +128,14 @@ func handle_drawing(event):
 
 func _draw():
 	#handle_outline()
-	draw_circle(Vector2(0,0), 7, Color.BLACK, false, 8)
-	draw_circle(Vector2(0,0), 8, final_animated_color, true)
 	
 	draw_style_box(boundary_stylebox, drawing_bound)
 	
-	if not drawing:
-		draw_style_box(boundary_stylebox, drawing_bound_small)
+	draw_circle(Vector2(0,0), 7, Color.BLACK, false, 8)
+	draw_circle(Vector2(0,0), 8, final_animated_color, true)
+	
+	#if not drawing:
+	#	draw_style_box(boundary_stylebox, drawing_bound_small)
 	
 	if len(point_position) < 1:
 		return
