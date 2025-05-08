@@ -126,7 +126,7 @@ func handle_drawing(event):
 
 func _draw():
 	#handle_outline()
-	draw_circle(Vector2(0,0), 7, Color.BLACK, false)
+	draw_circle(Vector2(0,0), 7, Color.BLACK, false, 8)
 	draw_circle(Vector2(0,0), 8, final_animated_color, true)
 	
 	draw_style_box(boundary_stylebox, drawing_bound)
@@ -140,7 +140,7 @@ func _draw():
 	if len(point_position) == 1:
 		draw_circle(point_position[0], 5, Color.BLACK)
 	else:
-		draw_polyline_colors(point_position, point_position_color, 5, true)
+		draw_polyline_colors(point_position, point_position_color, 5)
 	
 	if not drawing:
 		curr_position = point_position[len(point_position)-1]
