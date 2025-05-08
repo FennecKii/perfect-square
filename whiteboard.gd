@@ -4,7 +4,7 @@ extends Node2D
 var distance_curve: Curve
 
 var drawing: bool = false
-var point_spacing: float = 0.01
+var point_spacing: float = 0.005
 var point_position: PackedVector2Array = []
 var point_position_color: PackedColorArray = []
 var point_check: PackedVector2Array = []
@@ -104,7 +104,7 @@ func handle_drawing(event):
 		drawing = true
 		point_position.append(curr_position)
 		point_check.append(curr_position)
-		pretrace_pos_array = get_pretrace_array(compute_pretrace_square(point_position[0]), 30)
+		pretrace_pos_array = get_pretrace_array(compute_pretrace_square(point_position[0]), 60)
 		similarity_score = 100
 		queue_redraw()
 	elif event is InputEventMouseButton and Input.is_action_just_released("Draw"):
@@ -198,12 +198,12 @@ func compute_similarity(point_check_array: Array[Vector2], pretrace_pos_array: A
 		dorff_distance.append(vec_len(dorff_distance_vector.x , dorff_distance_vector.y))
 	point_accuracy = 100 * distance_curve.sample(dorff_distance.min())
 	if point_accuracy >= 90.0:
-		point_accuracy_weight = (point_array_size/(point_array_size * 0.999))/point_array_size
+		point_accuracy_weight = (point_array_size/(point_array_size * 0.99))/point_array_size
 		past_accuracy_weight = 1 - point_accuracy_weight
 	elif 60.0 <= point_accuracy and point_accuracy <= 90.0:
-		point_accuracy_weight = (point_array_size/(point_array_size * 0.20))/point_array_size
+		point_accuracy_weight = (point_array_size/(point_array_size * 0.275))/point_array_size
 		past_accuracy_weight = 1 - point_accuracy_weight
 	else:
-		point_accuracy_weight = (point_array_size/(point_array_size * 0.075))/point_array_size
+		point_accuracy_weight = (point_array_size/(point_array_size * 0.1))/point_array_size
 		past_accuracy_weight = 1 - point_accuracy_weight
 	return Vector2((past_accuracy * past_accuracy_weight) + (point_accuracy * point_accuracy_weight), point_accuracy) 
