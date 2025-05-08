@@ -138,7 +138,7 @@ func _draw():
 		return
 	
 	if len(point_position) == 1:
-		draw_circle(point_position[0], 5, Color.BLACK)
+		draw_circle(point_position[0], 7, similarity_gradient.sample(similarity_score/100))
 	else:
 		draw_polyline_colors(point_position, point_position_color, 5)
 	
@@ -201,9 +201,9 @@ func compute_similarity(point_check_array: Array[Vector2], pretrace_pos_array: A
 		point_accuracy_weight = (point_array_size/(point_array_size * 0.99))/point_array_size
 		past_accuracy_weight = 1 - point_accuracy_weight
 	elif 60.0 <= point_accuracy and point_accuracy <= 90.0:
-		point_accuracy_weight = (point_array_size/(point_array_size * 0.275))/point_array_size
+		point_accuracy_weight = (point_array_size/(point_array_size * 0.4))/point_array_size
 		past_accuracy_weight = 1 - point_accuracy_weight
 	else:
-		point_accuracy_weight = (point_array_size/(point_array_size * 0.1))/point_array_size
+		point_accuracy_weight = (point_array_size/(point_array_size * 0.2))/point_array_size
 		past_accuracy_weight = 1 - point_accuracy_weight
 	return Vector2((past_accuracy * past_accuracy_weight) + (point_accuracy * point_accuracy_weight), point_accuracy) 
