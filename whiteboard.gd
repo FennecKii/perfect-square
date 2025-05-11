@@ -18,6 +18,7 @@ var text_saturation_factor: float = 0.6
 var curr_position: Vector2
 var final_animated_color: Color
 var completed: bool = false
+var checkpoint_cleared: bool = false
 var highscore: float
 
 @onready
@@ -29,9 +30,7 @@ var title = $"Title(RGB)"
 @onready
 var camera = $Camera
 @onready 
-var checkpoint_1 = $"Checkpoint 1/Checkpoint 1 Collision"
-@onready
-var checkpoint_2 = $"Checkpoint 2/Checkpoint 2 Collision"
+var checkpoint = $"Checkpoint/Checkpoint Collision"
 @onready
 var boundary_stylebox = preload("res://stylebox_boundary.tres")
 @onready
@@ -76,6 +75,7 @@ func reset_game():
 	pretrace_pos_array = []
 	point_position_color = []
 	completed = false
+	checkpoint_cleared = false
 
 func reset_visuals():
 	similarity_score = 0
@@ -127,7 +127,7 @@ func handle_drawing(event):
 		point_check.append(curr_position)
 		pretrace_pos_array = get_pretrace_array(compute_pretrace_square(point_position[0]), 60)
 		similarity_score = 100
-		place_checkpoint(checkpoint_1, Vector2(-curr_position.x, -curr_position.y), Vector2(100, 100))
+		place_checkpoint(checkpoint, Vector2(curr_position.x, curr_position.y), Vector2(100, 100))
 		queue_redraw()
 	elif event is InputEventMouseButton and Input.is_action_just_released("Draw"):
 		drawing = false
@@ -238,11 +238,12 @@ func place_checkpoint(checkpoint: CollisionShape2D, pos: Vector2, size: Vector2)
 	checkpoint.position = pos
 	checkpoint.set_shape(checkpoint_shape)
 
-func _on_checkpoint_1_mouse_entered():
-	print("First Checkpoint Passed!")
-	checkpoint_1.disabled = true
-	place_checkpoint(checkpoint_2, Vector2(point_position[0].x, point_position[0].y), Vector2(10, 10))
+func _on_checkpoint_mouse_entered():
+	if !checkpoint_cleared:
+		return
+	else:
+		checkpoint.disabled = true
+		completed = true
 
-func _on_checkpoint_2_mouse_entered():
-	checkpoint_2.disabled = true
-	completed = true
+func _on_checkpoint_mouse_exited():
+	checkpoint_cleared = true

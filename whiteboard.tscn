@@ -61,20 +61,12 @@ text = "Perfect Square"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Checkpoint 1" type="Area2D" parent="."]
+[node name="Checkpoint" type="Area2D" parent="."]
 
-[node name="Checkpoint 1 Collision" type="CollisionShape2D" parent="Checkpoint 1"]
+[node name="Checkpoint Collision" type="CollisionShape2D" parent="Checkpoint"]
 z_index = 1
 shape = SubResource("RectangleShape2D_4ykqq")
 disabled = true
 
-[node name="Checkpoint 2" type="Area2D" parent="."]
-z_index = 1
-
-[node name="Checkpoint 2 Collision" type="CollisionShape2D" parent="Checkpoint 2"]
-z_index = 1
-shape = SubResource("RectangleShape2D_4ykqq")
-disabled = true
-
-[connection signal="mouse_entered" from="Checkpoint 1" to="." method="_on_checkpoint_1_mouse_entered"]
-[connection signal="mouse_entered" from="Checkpoint 2" to="." method="_on_checkpoint_2_mouse_entered"]
+[connection signal="mouse_entered" from="Checkpoint" to="." method="_on_checkpoint_mouse_entered"]
+[connection signal="mouse_exited" from="Checkpoint" to="." method="_on_checkpoint_mouse_exited"]
