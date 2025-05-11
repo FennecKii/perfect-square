@@ -17,6 +17,8 @@ var text_speed: float = 1.0
 var text_saturation_factor: float = 0.6
 var curr_position: Vector2
 var final_animated_color: Color
+var completed: bool = false
+var highscore: float
 
 @onready
 var half_screen_rect = get_viewport_rect().size / 2
@@ -26,6 +28,10 @@ var score_label = $Score
 var title = $"Title(RGB)"
 @onready
 var camera = $Camera
+@onready 
+var checkpoint_1 = $"Checkpoint 1/Checkpoint 1 Collision"
+@onready
+var checkpoint_2 = $"Checkpoint 2/Checkpoint 2 Collision"
 @onready
 var boundary_stylebox = preload("res://stylebox_boundary.tres")
 @onready
@@ -35,10 +41,14 @@ func _ready():
 	queue_redraw()
 	drawing_bound.position = Vector2(-280, -280)
 	drawing_bound.size = Vector2(560, 560)
-	drawing_bound_small.position = Vector2(-100, -100)
-	drawing_bound_small.size = Vector2(200, 200)
+	drawing_bound_small.position = Vector2(-50, -50)
+	drawing_bound_small.size = Vector2(100, 100)
 
 func _process(delta):
+	if similarity_score == 0:
+		score_label.add_theme_color_override("font_color", Color.WHITE)
+	else:
+		score_label.add_theme_color_override("font_color", similarity_gradient.sample(similarity_score/100))
 	score_label.text = str(str("%0.2f" % similarity_score,"%")) if similarity_score > 0 else 'X.X%'
 	update_title(delta)
 
@@ -65,6 +75,7 @@ func reset_game():
 	point_check = []
 	pretrace_pos_array = []
 	point_position_color = []
+	completed = false
 
 func reset_visuals():
 	similarity_score = 0
@@ -73,6 +84,14 @@ func reset_visuals():
 
 func handle_drawing(event):
 	if (event is not InputEventMouseButton) and (event is not InputEventMouseMotion):
+		return
+	elif completed and drawing:
+		if similarity_score <= highscore:
+			SignalBus.game_win.emit(0, highscore)
+		elif similarity_score > highscore:
+			highscore = similarity_score
+			SignalBus.game_win.emit(1, similarity_score)
+		drawing = false
 		return
 	
 	curr_position = event.position - half_screen_rect + Vector2(0, camera.position.y)
@@ -89,11 +108,11 @@ func handle_drawing(event):
 		reset_game()
 		queue_redraw()
 		return
-	elif drawing_bound_small.has_point(curr_position) and drawing:
-		SignalBus.game_lose.emit(1)
-		similarity_score = 0
-		drawing = false
-		return
+	#elif drawing_bound_small.has_point(curr_position) and drawing:
+	#	SignalBus.game_lose.emit(1)
+	#	similarity_score = 0
+	#	drawing = false
+	#	return
 	elif !drawing_bound.has_point(curr_position) and drawing:
 		SignalBus.game_lose.emit(3)
 		similarity_score = 0
@@ -108,6 +127,7 @@ func handle_drawing(event):
 		point_check.append(curr_position)
 		pretrace_pos_array = get_pretrace_array(compute_pretrace_square(point_position[0]), 60)
 		similarity_score = 100
+		place_checkpoint(checkpoint_1, Vector2(-curr_position.x, -curr_position.y), Vector2(100, 100))
 		queue_redraw()
 	elif event is InputEventMouseButton and Input.is_action_just_released("Draw"):
 		drawing = false
@@ -210,3 +230,19 @@ func compute_similarity(point_check_array: Array[Vector2], pretrace_pos_array: A
 		point_accuracy_weight = (point_array_size/(point_array_size * 0.2))/point_array_size
 		past_accuracy_weight = 1 - point_accuracy_weight
 	return Vector2((past_accuracy * past_accuracy_weight) + (point_accuracy * point_accuracy_weight), point_accuracy) 
+
+func place_checkpoint(checkpoint: CollisionShape2D, pos: Vector2, size: Vector2):
+	checkpoint.disabled = false
+	var checkpoint_shape := RectangleShape2D.new()
+	checkpoint_shape.size = size
+	checkpoint.position = pos
+	checkpoint.set_shape(checkpoint_shape)
+
+func _on_checkpoint_1_mouse_entered():
+	print("First Checkpoint Passed!")
+	checkpoint_1.disabled = true
+	place_checkpoint(checkpoint_2, Vector2(point_position[0].x, point_position[0].y), Vector2(10, 10))
+
+func _on_checkpoint_2_mouse_entered():
+	checkpoint_2.disabled = true
+	completed = true
