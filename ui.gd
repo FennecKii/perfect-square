@@ -6,6 +6,8 @@ var lose_label = $"Game Lose"
 var win_label = $"Game Win"
 @onready
 var game_start_label = $"Game Start"
+@onready
+var similarity_gradient = preload("res://similarity_gradient.tres")
 
 func _ready():
 	SignalBus.reset_ui.connect(_on_game_reset)
@@ -36,6 +38,8 @@ func _on_game_lose(type: int):
 func _on_game_win(type: int, score: float):
 	win_label.visible = true
 	if type == 0:
-		win_label.text = "Best Score: " + str(score)
+		win_label.add_theme_color_override("font_color", similarity_gradient.sample(score/100))
+		win_label.text = "Best Score: " + str("%0.2f" % score,"%")
 	elif type == 1:
-		win_label.text = "New Highscore: " + str(score)
+		win_label.add_theme_color_override("font_color", similarity_gradient.sample(score/100))
+		win_label.text = "New Highscore: " + str("%0.2f" % score,"%")
