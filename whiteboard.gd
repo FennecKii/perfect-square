@@ -8,6 +8,7 @@ var point_spacing: float = 0.005
 var point_position: PackedVector2Array = []
 var point_position_color: PackedColorArray = []
 var point_check: PackedVector2Array = []
+var pretrace_square: Rect2
 var pretrace_pos_array: Array[Vector2] = []
 var similarity_score: float
 var drawing_bound: Rect2
@@ -20,6 +21,9 @@ var final_animated_color: Color
 var completed: bool = false
 var checkpoint_cleared: bool = false
 var highscore: float
+var big_bound_exited: bool = false
+var small_bound_entered: bool = false
+var bound_collision_delta: float = 0.2
 
 @onready
 var half_screen_rect = get_viewport_rect().size / 2
@@ -31,6 +35,10 @@ var title = $"Title(RGB)"
 var camera = $Camera
 @onready 
 var checkpoint = $"Checkpoint/Checkpoint Collision"
+@onready 
+var small_bound_collision: CollisionShape2D = $"Small Area Bounds/Bound Collision"
+@onready
+var big_bound_collision: CollisionShape2D = $"Big Area Bounds/Bound Collision"
 @onready
 var boundary_stylebox = preload("res://stylebox_boundary.tres")
 @onready
@@ -42,6 +50,8 @@ func _ready():
 	drawing_bound.size = Vector2(560, 560)
 	drawing_bound_small.position = Vector2(-50, -50)
 	drawing_bound_small.size = Vector2(100, 100)
+	small_bound_collision.disabled = true
+	big_bound_collision.disabled = true
 
 func _process(delta):
 	if similarity_score == 0:
@@ -76,6 +86,9 @@ func reset_game():
 	point_position_color = []
 	completed = false
 	checkpoint_cleared = false
+	small_bound_entered = false
+	big_bound_exited = false
+	drawing = false
 
 func reset_visuals():
 	similarity_score = 0
@@ -95,6 +108,19 @@ func handle_drawing(event):
 		return
 	
 	curr_position = event.position - half_screen_rect + Vector2(0, camera.position.y)
+	
+	if small_bound_entered:
+		SignalBus.game_lose.emit(4)
+		similarity_score = 0
+		reset_game()
+		queue_redraw()
+		return
+	elif big_bound_exited:
+		SignalBus.game_lose.emit(4)
+		similarity_score = 0
+		reset_game()
+		queue_redraw()
+		return
 	
 	if !drawing_bound.has_point(curr_position) and not drawing and Input.is_action_just_pressed("Draw"):
 		SignalBus.game_lose.emit(3)
@@ -125,15 +151,22 @@ func handle_drawing(event):
 		drawing = true
 		point_position.append(curr_position)
 		point_check.append(curr_position)
-		pretrace_pos_array = get_pretrace_array(compute_pretrace_square(point_position[0]), 60)
+		pretrace_square = compute_pretrace_square(point_position[0])
+		pretrace_pos_array = get_pretrace_array(pretrace_square, 60)
 		similarity_score = 100
+		set_big_collision(pretrace_square, bound_collision_delta)
+		set_small_collision(pretrace_square, bound_collision_delta)
 		place_checkpoint(checkpoint, Vector2(curr_position.x, curr_position.y), Vector2(100, 100))
 		queue_redraw()
 	elif event is InputEventMouseButton and Input.is_action_just_released("Draw"):
 		drawing = false
 		queue_redraw()
+		small_bound_collision.disabled = true
+		big_bound_collision.disabled = true
 		return
 	elif event is InputEventMouseMotion and not drawing and Input.is_action_just_released("Draw"):
+		small_bound_collision.disabled = true
+		big_bound_collision.disabled = true
 		return
 	
 	if event is InputEventMouseMotion and drawing and Input.is_action_pressed("Draw") and not Input.is_action_just_released("Draw"):
@@ -149,6 +182,7 @@ func handle_drawing(event):
 func _draw():
 	#handle_outline()
 	
+	# Drawing Area visuals
 	draw_style_box(boundary_stylebox, drawing_bound)
 	
 	draw_circle(Vector2(0,0), 7, Color.BLACK, false, 8)
@@ -238,6 +272,18 @@ func place_checkpoint(checkpoint: CollisionShape2D, pos: Vector2, size: Vector2)
 	checkpoint.position = pos
 	checkpoint.set_shape(checkpoint_shape)
 
+func set_small_collision(pretrace_square: Rect2, deviation: float) -> void:
+	var collision_shape: RectangleShape2D = RectangleShape2D.new()
+	collision_shape.size = pretrace_square.size - pretrace_square.size * deviation
+	small_bound_collision.shape = collision_shape
+	small_bound_collision.disabled = false
+
+func set_big_collision(pretrace_square: Rect2, deviation: float) -> void:
+	var collision_shape: RectangleShape2D = RectangleShape2D.new()
+	collision_shape.size = pretrace_square.size + pretrace_square.size * deviation
+	big_bound_collision.shape = collision_shape
+	big_bound_collision.disabled = false
+
 func _on_checkpoint_mouse_entered():
 	if !checkpoint_cleared:
 		return
@@ -247,3 +293,9 @@ func _on_checkpoint_mouse_entered():
 
 func _on_checkpoint_mouse_exited():
 	checkpoint_cleared = true
+
+func _on_small_area_bounds_mouse_entered() -> void:
+	small_bound_entered = true
+
+func _on_big_area_bounds_mouse_exited() -> void:
+	big_bound_exited = true
