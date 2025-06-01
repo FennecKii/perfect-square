@@ -6,6 +6,7 @@ var distance_curve: Curve
 var drawing: bool = false
 var point_spacing: float = 0.005
 var point_position: PackedVector2Array = []
+var angles = []
 var point_position_color: PackedColorArray = []
 var point_check: PackedVector2Array = []
 var pretrace_square: Rect2
@@ -24,6 +25,8 @@ var highscore: float
 var big_bound_exited: bool = false
 var small_bound_entered: bool = false
 var bound_collision_delta: float = 0.2
+var angle_offset = 0
+var is_drawing_ccw = null
 
 @onready
 var half_screen_rect = get_viewport_rect().size / 2
@@ -81,6 +84,8 @@ func update_title(delta_time: float):
 
 func reset_game():
 	point_position = []
+	angles = []
+	is_drawing_ccw = null
 	point_check = []
 	pretrace_pos_array = []
 	point_position_color = []
@@ -98,7 +103,7 @@ func reset_visuals():
 func handle_drawing(event):
 	if (event is not InputEventMouseButton) and (event is not InputEventMouseMotion):
 		return
-	elif completed and drawing:
+	elif completed and drawing and point_position.size() > 40:
 		if similarity_score <= highscore:
 			SignalBus.game_win.emit(0, highscore)
 		elif similarity_score > highscore:
@@ -108,7 +113,14 @@ func handle_drawing(event):
 		return
 	
 	curr_position = event.position - half_screen_rect + Vector2(0, camera.position.y)
+	var curr_relative_angle = _calculate_coord_to_relative_degree_map(curr_position.x, curr_position.y)
 	
+	if angles.size() > 2 and is_drawing_ccw == null:
+		if angles[-1] < 180:
+			is_drawing_ccw = true
+		else:
+			is_drawing_ccw = false
+
 	if small_bound_entered:
 		SignalBus.game_lose.emit(4)
 		similarity_score = 0
@@ -129,6 +141,7 @@ func handle_drawing(event):
 		queue_redraw()
 		return
 	elif drawing_bound_small.has_point(curr_position) and not drawing and Input.is_action_just_pressed("Draw"):
+		# Refactor this into "emit and lose" method
 		SignalBus.game_lose.emit(4)
 		similarity_score = 0
 		reset_game()
@@ -144,19 +157,39 @@ func handle_drawing(event):
 		similarity_score = 0
 		drawing = false
 		return
+
+	if is_drawing_ccw != null:
+		if is_drawing_ccw:  # CCW
+			if curr_relative_angle < angles[-1]:
+				SignalBus.game_lose.emit(4)
+				similarity_score = 0
+				reset_game()
+				queue_redraw()
+				print('in here')
+				return
+		else:  #CW
+			if curr_relative_angle > angles[-1]:
+				SignalBus.game_lose.emit(4)
+				similarity_score = 0
+				reset_game()
+				queue_redraw()
+				print('or here')
+				return
 	
 	if event is InputEventMouseButton and Input.is_action_pressed("Draw"):
 		reset_game()
 		reset_visuals()
 		drawing = true
 		point_position.append(curr_position)
+		angle_offset = _calculate_coord_to_degree_map(curr_position.x, curr_position.y)
+		angles.append(curr_relative_angle)
 		point_check.append(curr_position)
 		pretrace_square = compute_pretrace_square(point_position[0])
 		pretrace_pos_array = get_pretrace_array(pretrace_square, 60)
 		similarity_score = 100
 		set_big_collision(pretrace_square, bound_collision_delta)
 		set_small_collision(pretrace_square, bound_collision_delta)
-		place_checkpoint(checkpoint, Vector2(curr_position.x, curr_position.y), Vector2(100, 100))
+		place_checkpoint(checkpoint, Vector2(curr_position.x, curr_position.y), Vector2(20, 20))
 		queue_redraw()
 	elif event is InputEventMouseButton and Input.is_action_just_released("Draw"):
 		drawing = false
@@ -177,6 +210,7 @@ func handle_drawing(event):
 			similarity_score = similarity_vec.x
 		point_position_color.append(similarity_gradient.sample(similarity_vec.y/100))
 		point_position.append(curr_position)
+		angles.append(curr_relative_angle)
 		queue_redraw()
 
 func _draw():
@@ -299,3 +333,17 @@ func _on_small_area_bounds_mouse_entered() -> void:
 
 func _on_big_area_bounds_mouse_exited() -> void:
 	big_bound_exited = true
+
+func _calculate_coord_to_degree_map(x, y):
+	var rad = atan2(x, y)
+	var deg = rad * (180 / PI)
+	if deg < 0:
+		deg += 360
+	return deg
+
+func _calculate_coord_to_relative_degree_map(x, y):
+	var deg = _calculate_coord_to_degree_map(x, y)
+	var adjusted = deg - angle_offset
+	if adjusted < 0:
+		adjusted += 360
+	return adjusted
