@@ -121,13 +121,13 @@ func handle_drawing(event):
 		else:
 			is_drawing_ccw = false
 
-	if small_bound_entered:
+	if small_bound_entered and drawing:
 		SignalBus.game_lose.emit(4)
 		similarity_score = 0
 		reset_game()
 		queue_redraw()
 		return
-	elif big_bound_exited:
+	elif big_bound_exited and drawing:
 		SignalBus.game_lose.emit(4)
 		similarity_score = 0
 		reset_game()
