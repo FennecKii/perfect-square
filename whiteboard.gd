@@ -43,8 +43,8 @@ func _ready():
 	queue_redraw()
 	drawing_bound.position = Vector2(-280, -280)
 	drawing_bound.size = Vector2(560, 560)
-	drawing_bound_small.position = Vector2(-65, -65)
-	drawing_bound_small.size = Vector2(130, 130)
+	drawing_bound_small.position = Vector2(-75, -75)
+	drawing_bound_small.size = Vector2(150, 150)
 	small_bound_collision.disabled = true
 	big_bound_collision.disabled = true
 	win_area_collision.disabled = true
@@ -298,14 +298,14 @@ func compute_similarity(point_check_array: Array[Vector2], pretrace_pos_array: A
 func set_win_area(area_collision: CollisionShape2D, pos: Vector2):
 	var area_collision_shape := RectangleShape2D.new()
 	var collision_size: Vector2
-	if abs(abs(pos.x) - abs(pos.y)) < 35:
+	if abs(abs(pos.x) - abs(pos.y)) < 45:
 		if pos.x * pos.y > 0:
 			area_collision.rotation_degrees = -45
 		else:
 			area_collision.rotation_degrees = 45
 	else:
 		area_collision.rotation = 0
-	if abs(abs(pos.x) - abs(pos.y)) < 35 or abs(pos.x) < abs(pos.y):
+	if abs(abs(pos.x) - abs(pos.y)) < 45 or abs(pos.x) < abs(pos.y):
 		collision_size = Vector2(17, 110)
 	else:
 		collision_size = Vector2(110, 17)
@@ -315,7 +315,7 @@ func set_win_area(area_collision: CollisionShape2D, pos: Vector2):
 
 func set_small_collision(pretrace_square: Rect2) -> void:
 	var collision_shape: RectangleShape2D = RectangleShape2D.new()
-	collision_shape.size = pretrace_square.size - bound_collision_delta
+	collision_shape.size = pretrace_square.size - bound_collision_delta * 1.25
 	small_bound_collision.shape = collision_shape
 	small_bound_collision.disabled = false
 
