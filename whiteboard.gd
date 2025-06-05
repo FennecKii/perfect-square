@@ -154,7 +154,6 @@ func handle_drawing(event):
 		return
 
 	if is_drawing_ccw != null and drawing and not completed and angles.size() > 5:
-		print("Current angle: %.2f" %curr_relative_angle, "Turnaround Angle: %.2f" %angles[0])
 		if is_drawing_ccw:  # CCW
 			if curr_relative_angle > 359.7 or curr_relative_angle < 25:
 				pass
