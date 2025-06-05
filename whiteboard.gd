@@ -43,8 +43,8 @@ func _ready():
 	queue_redraw()
 	drawing_bound.position = Vector2(-280, -280)
 	drawing_bound.size = Vector2(560, 560)
-	drawing_bound_small.position = Vector2(-75, -75)
-	drawing_bound_small.size = Vector2(150, 150)
+	drawing_bound_small.position = Vector2(-60, -60)
+	drawing_bound_small.size = Vector2(120, 120)
 	small_bound_collision.disabled = true
 	big_bound_collision.disabled = true
 	win_area_collision.disabled = true
@@ -141,6 +141,7 @@ func handle_drawing(event):
 		return
 	elif drawing_bound_small.has_point(curr_position) and not drawing and Input.is_action_just_pressed("Draw"):
 		# Refactor this into "emit and lose" method
+		reset_visuals()
 		SignalBus.game_lose.emit(Global.LoseMessage.TOOSMALL)
 		similarity_score = 0
 		reset_game()
@@ -153,8 +154,9 @@ func handle_drawing(event):
 		return
 
 	if is_drawing_ccw != null and drawing and not completed and angles.size() > 5:
+		print("Current angle: %.2f" %curr_relative_angle, "Turnaround Angle: %.2f" %angles[0])
 		if is_drawing_ccw:  # CCW
-			if curr_relative_angle > 359.9 or curr_relative_angle < 5:
+			if curr_relative_angle > 359.7 or curr_relative_angle < 25:
 				pass
 			elif curr_relative_angle < angles[0]:
 				SignalBus.game_lose.emit(Global.LoseMessage.WRONGWAY)
@@ -162,7 +164,7 @@ func handle_drawing(event):
 				drawing = false
 				return
 		else:  #CW
-			if curr_relative_angle < 0.1 or curr_relative_angle > 355:
+			if curr_relative_angle < 0.3 or curr_relative_angle > 335:
 				pass
 			elif curr_relative_angle > angles[0]:
 				SignalBus.game_lose.emit(Global.LoseMessage.WRONGWAY)
