@@ -306,9 +306,9 @@ func set_win_area(area_collision: CollisionShape2D, pos: Vector2):
 	else:
 		area_collision.rotation = 0
 	if abs(abs(pos.x) - abs(pos.y)) < 35 or abs(pos.x) < abs(pos.y):
-		collision_size = Vector2(10, 110)
+		collision_size = Vector2(17, 110)
 	else:
-		collision_size = Vector2(110, 10)
+		collision_size = Vector2(110, 17)
 	area_collision_shape.size = collision_size
 	area_collision.position = pos
 	area_collision.set_shape(area_collision_shape)

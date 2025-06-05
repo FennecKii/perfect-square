@@ -26,7 +26,7 @@ func _on_game_lose(type: int):
 		Global.LoseMessage.WRONGWAY:
 			lose_label.text = "Wrong Way!"
 		Global.LoseMessage.DRAWSQUARE:
-			lose_label.text = "Please Draw A Square."
+			lose_label.text = "Stay on Track!"
 		Global.LoseMessage.OUTBOUNDS:
 			lose_label.text = "Out of Bounds!"
 		Global.LoseMessage.TOOSMALL:
@@ -36,7 +36,8 @@ func _on_game_win(type: int, score: float):
 	win_label.visible = true
 	match type:
 		Global.WinMessage.OLDSCORE:
-			win_label.add_theme_color_override("font_color", similarity_gradient.sample(score/100))
+			#win_label.add_theme_color_override("font_color", similarity_gradient.sample(score/100))
+			win_label.add_theme_color_override("font_color", Color.DODGER_BLUE)
 			win_label.text = "Best Score: " + str("%0.2f" % score,"%")
 		Global.WinMessage.HIGHSCORE:
 			win_label.add_theme_color_override("font_color", similarity_gradient.sample(score/100))
