@@ -1,6 +1,6 @@
 extends Node2D
 
-@export 
+@export
 var distance_curve: Curve
 
 var drawing: bool = false
@@ -30,15 +30,15 @@ var is_drawing_ccw = null
 
 @onready
 var half_screen_rect = get_viewport_rect().size / 2
-@onready 
+@onready
 var score_label = $Score
 @onready
 var title = $"Title(RGB)"
 @onready
 var camera = $Camera
-@onready 
+@onready
 var checkpoint = $"Checkpoint/Checkpoint Collision"
-@onready 
+@onready
 var small_bound_collision: CollisionShape2D = $"Small Area Bounds/Bound Collision"
 @onready
 var big_bound_collision: CollisionShape2D = $"Big Area Bounds/Bound Collision"
@@ -111,10 +111,10 @@ func handle_drawing(event):
 			SignalBus.game_win.emit(1, similarity_score)
 		drawing = false
 		return
-	
+
 	curr_position = event.position - half_screen_rect + Vector2(0, camera.position.y)
 	var curr_relative_angle = _calculate_coord_to_relative_degree_map(curr_position.x, curr_position.y)
-	
+
 	if angles.size() > 2 and is_drawing_ccw == null:
 		if angles[-1] < 180:
 			is_drawing_ccw = true
@@ -124,16 +124,14 @@ func handle_drawing(event):
 	if small_bound_entered and drawing:
 		SignalBus.game_lose.emit(4)
 		similarity_score = 0
-		reset_game()
-		queue_redraw()
+		drawing = false
 		return
 	elif big_bound_exited and drawing:
 		SignalBus.game_lose.emit(4)
 		similarity_score = 0
-		reset_game()
-		queue_redraw()
+		drawing = false
 		return
-	
+
 	if !drawing_bound.has_point(curr_position) and not drawing and Input.is_action_just_pressed("Draw"):
 		SignalBus.game_lose.emit(3)
 		similarity_score = 0
@@ -147,35 +145,26 @@ func handle_drawing(event):
 		reset_game()
 		queue_redraw()
 		return
-	#elif drawing_bound_small.has_point(curr_position) and drawing:
-	#	SignalBus.game_lose.emit(1)
-	#	similarity_score = 0
-	#	drawing = false
-	#	return
 	elif !drawing_bound.has_point(curr_position) and drawing:
 		SignalBus.game_lose.emit(3)
 		similarity_score = 0
 		drawing = false
 		return
 
-	if is_drawing_ccw != null:
+	if is_drawing_ccw != null and drawing:
 		if is_drawing_ccw:  # CCW
 			if curr_relative_angle < angles[-1]:
 				SignalBus.game_lose.emit(4)
 				similarity_score = 0
-				reset_game()
-				queue_redraw()
-				print('in here')
+				drawing = false
 				return
 		else:  #CW
 			if curr_relative_angle > angles[-1]:
 				SignalBus.game_lose.emit(4)
 				similarity_score = 0
-				reset_game()
-				queue_redraw()
-				print('or here')
+				drawing = false
 				return
-	
+
 	if event is InputEventMouseButton and Input.is_action_pressed("Draw"):
 		reset_game()
 		reset_visuals()
@@ -201,7 +190,7 @@ func handle_drawing(event):
 		small_bound_collision.disabled = true
 		big_bound_collision.disabled = true
 		return
-	
+
 	if event is InputEventMouseMotion and drawing and Input.is_action_pressed("Draw") and not Input.is_action_just_released("Draw"):
 		var similarity_vec: Vector2 = Vector2()
 		if vec_len(curr_position.x - point_check[len(point_check) - 1].x, curr_position.y - point_check[len(point_check) - 1].y) >= point_spacing:
@@ -215,32 +204,26 @@ func handle_drawing(event):
 
 func _draw():
 	#handle_outline()
-	
+
 	# Drawing Area visuals
 	draw_style_box(boundary_stylebox, drawing_bound)
-	
+
 	draw_circle(Vector2(0,0), 7, Color.BLACK, false, 8)
 	draw_circle(Vector2(0,0), 8, final_animated_color, true)
-	
-	#if not drawing:
-	#	draw_style_box(boundary_stylebox, drawing_bound_small)
-	
+
 	if len(point_position) < 1:
 		return
-	
+
 	if len(point_position) == 1:
 		draw_circle(point_position[0], 7, similarity_gradient.sample(similarity_score/100))
 	else:
 		draw_polyline_colors(point_position, point_position_color, 5)
-	
+
 	if not drawing:
 		curr_position = point_position[len(point_position)-1]
-	
+
 	if len(point_position_color) > 0:
 		draw_circle(curr_position, 7, point_position_color[len(point_position_color)-1], true)
-	#if len(pretrace_pos_array) > 1:
-	#	for point in pretrace_pos_array:
-	#		draw_circle(point, 5, Color.REBECCA_PURPLE, true)
 
 func handle_outline():
 	draw_circle(Vector2(0, 0), 3, Color.TAN)
@@ -269,7 +252,7 @@ func get_pretrace_array(pretrace_square: Rect2, size: int):
 		Vector2(pretrace_square.position.x, pretrace_square.position.y + pretrace_square.size.y),
 	]
 	var pos_discrim = (pretrace_square.size).x / size
-	
+
 	for i in range(0, size):
 		pretrace_pos_array.append(Vector2(pretrace_vertex_pos[0].x + i*pos_discrim, pretrace_vertex_pos[0].y))
 		pretrace_pos_array.append(Vector2(pretrace_vertex_pos[2].x - i*pos_discrim, pretrace_vertex_pos[2].y))
@@ -297,7 +280,7 @@ func compute_similarity(point_check_array: Array[Vector2], pretrace_pos_array: A
 	else:
 		point_accuracy_weight = (point_array_size/(point_array_size * 0.2))/point_array_size
 		past_accuracy_weight = 1 - point_accuracy_weight
-	return Vector2((past_accuracy * past_accuracy_weight) + (point_accuracy * point_accuracy_weight), point_accuracy) 
+	return Vector2((past_accuracy * past_accuracy_weight) + (point_accuracy * point_accuracy_weight), point_accuracy)
 
 func place_checkpoint(checkpoint: CollisionShape2D, pos: Vector2, size: Vector2):
 	checkpoint.disabled = false
