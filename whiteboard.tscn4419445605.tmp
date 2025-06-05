@@ -65,10 +65,12 @@ text = "Perfect Square"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Win Area" type="Area2D" parent="."]
+[node name="Checkpoint" type="Area2D" parent="."]
 
-[node name="Win Area Collision" type="CollisionShape2D" parent="Win Area"]
+[node name="Checkpoint Collision" type="CollisionShape2D" parent="Checkpoint"]
+z_index = 1
 shape = SubResource("RectangleShape2D_4ykqq")
+disabled = true
 
 [node name="Small Area Bounds" type="Area2D" parent="."]
 
@@ -80,6 +82,7 @@ shape = SubResource("RectangleShape2D_qxae8")
 [node name="Bound Collision" type="CollisionShape2D" parent="Big Area Bounds"]
 shape = SubResource("RectangleShape2D_5b0t2")
 
-[connection signal="mouse_entered" from="Win Area" to="." method="_on_win_area_mouse_entered"]
+[connection signal="mouse_entered" from="Checkpoint" to="." method="_on_checkpoint_mouse_entered"]
+[connection signal="mouse_exited" from="Checkpoint" to="." method="_on_checkpoint_mouse_exited"]
 [connection signal="mouse_entered" from="Small Area Bounds" to="." method="_on_small_area_bounds_mouse_entered"]
 [connection signal="mouse_exited" from="Big Area Bounds" to="." method="_on_big_area_bounds_mouse_exited"]

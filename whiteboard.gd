@@ -1,12 +1,11 @@
 extends Node2D
 
-@export
-var distance_curve: Curve
+@export var distance_curve: Curve
 
 var drawing: bool = false
-var point_spacing: float = 0.005
+var point_spacing: float = 0.0025
 var point_position: PackedVector2Array = []
-var angles = []
+var angles: Array[float] = []
 var point_position_color: PackedColorArray = []
 var point_check: PackedVector2Array = []
 var pretrace_square: Rect2
@@ -20,41 +19,35 @@ var text_saturation_factor: float = 0.6
 var curr_position: Vector2
 var final_animated_color: Color
 var completed: bool = false
-var checkpoint_cleared: bool = false
 var highscore: float
 var big_bound_exited: bool = false
 var small_bound_entered: bool = false
-var bound_collision_delta: float = 0.2
-var angle_offset = 0
+var bound_collision_delta: Vector2 = Vector2(90, 90)
+var angle_offset: float = 0
+var max_angle_array_size: int = 25
 var is_drawing_ccw = null
+var curr_relative_angle: float
+var win_con_angle: float
 
-@onready
-var half_screen_rect = get_viewport_rect().size / 2
-@onready
-var score_label = $Score
-@onready
-var title = $"Title(RGB)"
-@onready
-var camera = $Camera
-@onready
-var checkpoint = $"Checkpoint/Checkpoint Collision"
-@onready
-var small_bound_collision: CollisionShape2D = $"Small Area Bounds/Bound Collision"
-@onready
-var big_bound_collision: CollisionShape2D = $"Big Area Bounds/Bound Collision"
-@onready
-var boundary_stylebox = preload("res://stylebox_boundary.tres")
-@onready
-var similarity_gradient = preload("res://similarity_gradient.tres")
+@onready var half_screen_rect = get_viewport_rect().size / 2
+@onready var score_label = $Score
+@onready var title = $"Title(RGB)"
+@onready var camera = $Camera
+@onready var win_area_collision = $"Win Area/Win Area Collision"
+@onready var small_bound_collision: CollisionShape2D = $"Small Area Bounds/Bound Collision"
+@onready var big_bound_collision: CollisionShape2D = $"Big Area Bounds/Bound Collision"
+@onready var boundary_stylebox = preload("res://stylebox_boundary.tres")
+@onready var similarity_gradient = preload("res://similarity_gradient.tres")
 
 func _ready():
 	queue_redraw()
 	drawing_bound.position = Vector2(-280, -280)
 	drawing_bound.size = Vector2(560, 560)
-	drawing_bound_small.position = Vector2(-50, -50)
-	drawing_bound_small.size = Vector2(100, 100)
+	drawing_bound_small.position = Vector2(-65, -65)
+	drawing_bound_small.size = Vector2(130, 130)
 	small_bound_collision.disabled = true
 	big_bound_collision.disabled = true
+	win_area_collision.disabled = true
 
 func _process(delta):
 	if similarity_score == 0:
@@ -90,10 +83,10 @@ func reset_game():
 	pretrace_pos_array = []
 	point_position_color = []
 	completed = false
-	checkpoint_cleared = false
 	small_bound_entered = false
 	big_bound_exited = false
 	drawing = false
+	win_area_collision.disabled = true
 
 func reset_visuals():
 	similarity_score = 0
@@ -103,103 +96,123 @@ func reset_visuals():
 func handle_drawing(event):
 	if (event is not InputEventMouseButton) and (event is not InputEventMouseMotion):
 		return
-	elif completed and drawing and point_position.size() > 40:
+	elif completed and drawing and point_position.size() > 100:
 		if similarity_score <= highscore:
-			SignalBus.game_win.emit(0, highscore)
+			SignalBus.game_win.emit(Global.WinMessage.OLDSCORE, highscore)
 		elif similarity_score > highscore:
 			highscore = similarity_score
-			SignalBus.game_win.emit(1, similarity_score)
+			SignalBus.game_win.emit(Global.WinMessage.HIGHSCORE, similarity_score)
+		drawing = false
+		return
+	elif not completed and drawing and Input.is_action_just_released("Draw"):
+		SignalBus.game_lose.emit(Global.LoseMessage.TRYAGAIN)
+		similarity_score = 0
 		drawing = false
 		return
 
 	curr_position = event.position - half_screen_rect + Vector2(0, camera.position.y)
-	var curr_relative_angle = _calculate_coord_to_relative_degree_map(curr_position.x, curr_position.y)
 
-	if angles.size() > 2 and is_drawing_ccw == null:
-		if angles[-1] < 180:
+	if angles.size() > 10 and is_drawing_ccw == null:
+		if angles[-1] > 10 and angles[-1] < 180:
+			angles = []
 			is_drawing_ccw = true
-		else:
+			win_area_collision.disabled = false
+		elif angles[-1] < 350 and angles[-1] > 180:
+			angles = []
 			is_drawing_ccw = false
+			win_area_collision.disabled = false
 
 	if small_bound_entered and drawing:
-		SignalBus.game_lose.emit(4)
+		SignalBus.game_lose.emit(Global.LoseMessage.DRAWSQUARE)
 		similarity_score = 0
 		drawing = false
 		return
 	elif big_bound_exited and drawing:
-		SignalBus.game_lose.emit(4)
+		SignalBus.game_lose.emit(Global.LoseMessage.DRAWSQUARE)
 		similarity_score = 0
 		drawing = false
 		return
 
 	if !drawing_bound.has_point(curr_position) and not drawing and Input.is_action_just_pressed("Draw"):
-		SignalBus.game_lose.emit(3)
+		SignalBus.game_lose.emit(Global.LoseMessage.OUTBOUNDS)
 		similarity_score = 0
 		reset_game()
 		queue_redraw()
 		return
 	elif drawing_bound_small.has_point(curr_position) and not drawing and Input.is_action_just_pressed("Draw"):
 		# Refactor this into "emit and lose" method
-		SignalBus.game_lose.emit(4)
+		SignalBus.game_lose.emit(Global.LoseMessage.TOOSMALL)
 		similarity_score = 0
 		reset_game()
 		queue_redraw()
 		return
 	elif !drawing_bound.has_point(curr_position) and drawing:
-		SignalBus.game_lose.emit(3)
+		SignalBus.game_lose.emit(Global.LoseMessage.OUTBOUNDS)
 		similarity_score = 0
 		drawing = false
 		return
 
-	if is_drawing_ccw != null and drawing:
+	if is_drawing_ccw != null and drawing and not completed and angles.size() > 5:
 		if is_drawing_ccw:  # CCW
-			if curr_relative_angle < angles[-1]:
-				SignalBus.game_lose.emit(4)
+			if curr_relative_angle > 359.9 or curr_relative_angle < 5:
+				pass
+			elif curr_relative_angle < angles[0]:
+				SignalBus.game_lose.emit(Global.LoseMessage.WRONGWAY)
 				similarity_score = 0
 				drawing = false
 				return
 		else:  #CW
-			if curr_relative_angle > angles[-1]:
-				SignalBus.game_lose.emit(4)
+			if curr_relative_angle < 0.1 or curr_relative_angle > 355:
+				pass
+			elif curr_relative_angle > angles[0]:
+				SignalBus.game_lose.emit(Global.LoseMessage.WRONGWAY)
 				similarity_score = 0
 				drawing = false
 				return
 
-	if event is InputEventMouseButton and Input.is_action_pressed("Draw"):
+	if event is InputEventMouseButton and Input.is_action_just_pressed("Draw"):
 		reset_game()
 		reset_visuals()
 		drawing = true
 		point_position.append(curr_position)
 		angle_offset = _calculate_coord_to_degree_map(curr_position.x, curr_position.y)
+		curr_relative_angle = _calculate_coord_to_relative_degree_map(curr_position.x, curr_position.y - camera.position.y)
 		angles.append(curr_relative_angle)
 		point_check.append(curr_position)
 		pretrace_square = compute_pretrace_square(point_position[0])
 		pretrace_pos_array = get_pretrace_array(pretrace_square, 60)
 		similarity_score = 100
-		set_big_collision(pretrace_square, bound_collision_delta)
-		set_small_collision(pretrace_square, bound_collision_delta)
-		place_checkpoint(checkpoint, Vector2(curr_position.x, curr_position.y), Vector2(20, 20))
+		set_big_collision(pretrace_square)
+		set_small_collision(pretrace_square)
+		set_win_area(win_area_collision, point_position[0])
 		queue_redraw()
 	elif event is InputEventMouseButton and Input.is_action_just_released("Draw"):
 		drawing = false
 		queue_redraw()
 		small_bound_collision.disabled = true
 		big_bound_collision.disabled = true
+		win_area_collision.disabled = true
 		return
 	elif event is InputEventMouseMotion and not drawing and Input.is_action_just_released("Draw"):
 		small_bound_collision.disabled = true
 		big_bound_collision.disabled = true
+		win_area_collision.disabled = true
 		return
 
 	if event is InputEventMouseMotion and drawing and Input.is_action_pressed("Draw") and not Input.is_action_just_released("Draw"):
 		var similarity_vec: Vector2 = Vector2()
-		if vec_len(curr_position.x - point_check[len(point_check) - 1].x, curr_position.y - point_check[len(point_check) - 1].y) >= point_spacing:
+		if vec_len(curr_position.x - point_check[-1].x, curr_position.y - point_check[-1].y) >= point_spacing:
 			point_check.append(curr_position)
 			similarity_vec = compute_similarity(point_check, pretrace_pos_array, similarity_score)
 			similarity_score = similarity_vec.x
 		point_position_color.append(similarity_gradient.sample(similarity_vec.y/100))
 		point_position.append(curr_position)
-		angles.append(curr_relative_angle)
+		curr_relative_angle = _calculate_coord_to_relative_degree_map(curr_position.x, curr_position.y - camera.position.y)
+		if angles.size() > max_angle_array_size:
+			angles.remove_at(0)
+			angles.append(curr_relative_angle)
+		else:
+			angles.append(curr_relative_angle)
 		queue_redraw()
 
 func _draw():
@@ -220,10 +233,10 @@ func _draw():
 		draw_polyline_colors(point_position, point_position_color, 5)
 
 	if not drawing:
-		curr_position = point_position[len(point_position)-1]
+		curr_position = point_position[-1]
 
 	if len(point_position_color) > 0:
-		draw_circle(curr_position, 7, point_position_color[len(point_position_color)-1], true)
+		draw_circle(curr_position, 7, point_position_color[-1], true)
 
 func handle_outline():
 	draw_circle(Vector2(0, 0), 3, Color.TAN)
@@ -268,7 +281,7 @@ func compute_similarity(point_check_array: Array[Vector2], pretrace_pos_array: A
 	var point_accuracy_weight: float
 	var dorff_distance_vector: Vector2
 	for s in pretrace_pos_array:
-		dorff_distance_vector = point_check_array[point_array_size-1] - s
+		dorff_distance_vector = point_check_array[-1] - s
 		dorff_distance.append(vec_len(dorff_distance_vector.x , dorff_distance_vector.y))
 	point_accuracy = 100 * distance_curve.sample(dorff_distance.min())
 	if point_accuracy >= 90.0:
@@ -282,34 +295,35 @@ func compute_similarity(point_check_array: Array[Vector2], pretrace_pos_array: A
 		past_accuracy_weight = 1 - point_accuracy_weight
 	return Vector2((past_accuracy * past_accuracy_weight) + (point_accuracy * point_accuracy_weight), point_accuracy)
 
-func place_checkpoint(checkpoint: CollisionShape2D, pos: Vector2, size: Vector2):
-	checkpoint.disabled = false
-	var checkpoint_shape := RectangleShape2D.new()
-	checkpoint_shape.size = size
-	checkpoint.position = pos
-	checkpoint.set_shape(checkpoint_shape)
+func set_win_area(area_collision: CollisionShape2D, pos: Vector2):
+	var area_collision_shape := RectangleShape2D.new()
+	var collision_size: Vector2
+	if abs(abs(pos.x) - abs(pos.y)) < 35:
+		if pos.x * pos.y > 0:
+			area_collision.rotation_degrees = -45
+		else:
+			area_collision.rotation_degrees = 45
+	else:
+		area_collision.rotation = 0
+	if abs(abs(pos.x) - abs(pos.y)) < 35 or abs(pos.x) < abs(pos.y):
+		collision_size = Vector2(10, 110)
+	else:
+		collision_size = Vector2(110, 10)
+	area_collision_shape.size = collision_size
+	area_collision.position = pos
+	area_collision.set_shape(area_collision_shape)
 
-func set_small_collision(pretrace_square: Rect2, deviation: float) -> void:
+func set_small_collision(pretrace_square: Rect2) -> void:
 	var collision_shape: RectangleShape2D = RectangleShape2D.new()
-	collision_shape.size = pretrace_square.size - pretrace_square.size * deviation
+	collision_shape.size = pretrace_square.size - bound_collision_delta
 	small_bound_collision.shape = collision_shape
 	small_bound_collision.disabled = false
 
-func set_big_collision(pretrace_square: Rect2, deviation: float) -> void:
+func set_big_collision(pretrace_square: Rect2) -> void:
 	var collision_shape: RectangleShape2D = RectangleShape2D.new()
-	collision_shape.size = pretrace_square.size + pretrace_square.size * deviation
+	collision_shape.size = pretrace_square.size + bound_collision_delta
 	big_bound_collision.shape = collision_shape
 	big_bound_collision.disabled = false
-
-func _on_checkpoint_mouse_entered():
-	if !checkpoint_cleared:
-		return
-	else:
-		checkpoint.disabled = true
-		completed = true
-
-func _on_checkpoint_mouse_exited():
-	checkpoint_cleared = true
 
 func _on_small_area_bounds_mouse_entered() -> void:
 	small_bound_entered = true
@@ -330,3 +344,6 @@ func _calculate_coord_to_relative_degree_map(x, y):
 	if adjusted < 0:
 		adjusted += 360
 	return adjusted
+
+func _on_win_area_mouse_entered() -> void:
+	completed = true

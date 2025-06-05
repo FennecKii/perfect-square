@@ -1,11 +1,9 @@
-[gd_scene load_steps=8 format=3 uid="uid://cj881scupmcst"]
+[gd_scene load_steps=7 format=3 uid="uid://cj881scupmcst"]
 
 [ext_resource type="Script" uid="uid://dveesddjx3uhj" path="res://whiteboard.gd" id="1_ihy0m"]
 [ext_resource type="Curve" uid="uid://de73cvwww280o" path="res://distrance_curve.tres" id="2_tyhvn"]
 [ext_resource type="Theme" uid="uid://bcb6jx2yuewkc" path="res://ui_default_theme.tres" id="3_c7jcs"]
 [ext_resource type="PackedScene" uid="uid://31catl2ugpea" path="res://ui.tscn" id="4_4ykqq"]
-
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_4ykqq"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_qxae8"]
 
@@ -65,11 +63,6 @@ text = "Perfect Square"
 horizontal_alignment = 1
 vertical_alignment = 1
 
-[node name="Win Area" type="Area2D" parent="."]
-
-[node name="Win Area Collision" type="CollisionShape2D" parent="Win Area"]
-shape = SubResource("RectangleShape2D_4ykqq")
-
 [node name="Small Area Bounds" type="Area2D" parent="."]
 
 [node name="Bound Collision" type="CollisionShape2D" parent="Small Area Bounds"]
@@ -80,6 +73,5 @@ shape = SubResource("RectangleShape2D_qxae8")
 [node name="Bound Collision" type="CollisionShape2D" parent="Big Area Bounds"]
 shape = SubResource("RectangleShape2D_5b0t2")
 
-[connection signal="mouse_entered" from="Win Area" to="." method="_on_win_area_mouse_entered"]
 [connection signal="mouse_entered" from="Small Area Bounds" to="." method="_on_small_area_bounds_mouse_entered"]
 [connection signal="mouse_exited" from="Big Area Bounds" to="." method="_on_big_area_bounds_mouse_exited"]
