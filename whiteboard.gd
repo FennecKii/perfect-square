@@ -285,14 +285,14 @@ func compute_similarity(point_check_array: Array[Vector2], pretrace_pos_array: A
 		dorff_distance_vector = point_check_array[-1] - s
 		dorff_distance.append(vec_len(dorff_distance_vector.x , dorff_distance_vector.y))
 	point_accuracy = 100 * distance_curve.sample(dorff_distance.min())
-	if point_accuracy >= 90.0:
-		point_accuracy_weight = (point_array_size/(point_array_size * 0.99))/point_array_size
+	if point_accuracy >= 93.0:
+		point_accuracy_weight = (point_array_size/(point_array_size * 0.999))/point_array_size
 		past_accuracy_weight = 1 - point_accuracy_weight
-	elif 60.0 <= point_accuracy and point_accuracy <= 90.0:
-		point_accuracy_weight = (point_array_size/(point_array_size * 0.4))/point_array_size
+	elif 60.0 <= point_accuracy and point_accuracy <= 93.0:
+		point_accuracy_weight = (point_array_size/(point_array_size * 0.333))/point_array_size
 		past_accuracy_weight = 1 - point_accuracy_weight
 	else:
-		point_accuracy_weight = (point_array_size/(point_array_size * 0.2))/point_array_size
+		point_accuracy_weight = (point_array_size/(point_array_size * 0.133))/point_array_size
 		past_accuracy_weight = 1 - point_accuracy_weight
 	return Vector2((past_accuracy * past_accuracy_weight) + (point_accuracy * point_accuracy_weight), point_accuracy)
 
