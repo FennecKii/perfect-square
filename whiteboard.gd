@@ -3,7 +3,7 @@ extends Node2D
 @export var distance_curve: Curve
 
 var drawing: bool = false
-var point_spacing: float = 0.0025
+var point_spacing: float = 0.0001
 var point_position: PackedVector2Array = []
 var angles: Array[float] = []
 var point_position_color: PackedColorArray = []
@@ -24,10 +24,12 @@ var big_bound_exited: bool = false
 var small_bound_entered: bool = false
 var bound_collision_delta: Vector2 = Vector2(90, 90)
 var angle_offset: float = 0
-var max_angle_array_size: int = 5
+var max_angle_array_size: int = 30
 var is_drawing_ccw = null
 var curr_relative_angle: float
 var win_con_angle: float
+var revolution_completed: bool = false
+var half_revolution_completed: bool = false
 
 @onready var half_screen_rect = get_viewport_rect().size / 2
 @onready var score_label = $Score
@@ -56,6 +58,9 @@ func _process(delta):
 		score_label.add_theme_color_override("font_color", similarity_gradient.sample(similarity_score/100))
 	score_label.text = str(str("%0.2f" % similarity_score,"%")) if similarity_score > 0 else 'X.X%'
 	update_title(delta)
+
+	if revolution_completed:
+		completed = true
 
 func _input(event):
 	handle_drawing(event)
@@ -87,6 +92,8 @@ func reset_game():
 	big_bound_exited = false
 	drawing = false
 	win_area_collision.disabled = true
+	revolution_completed = false
+	half_revolution_completed = false
 
 func reset_visuals():
 	similarity_score = 0
@@ -112,7 +119,7 @@ func handle_drawing(event: InputEvent):
 
 	curr_position = event.position - half_screen_rect + Vector2(0, camera.position.y)
 
-	if angles.size() >= max_angle_array_size and is_drawing_ccw == null:
+	if angles.size() >= max_angle_array_size/2.0 and is_drawing_ccw == null:
 		if angles[-1] > 5 and angles[-1] < 180:
 			angles = []
 			is_drawing_ccw = true
@@ -120,7 +127,8 @@ func handle_drawing(event: InputEvent):
 			angles = []
 			is_drawing_ccw = false
 
-	if drawing and curr_relative_angle > 175 and curr_relative_angle < 185:
+	if drawing and curr_relative_angle > 170 and curr_relative_angle < 190:
+		half_revolution_completed = true
 		win_area_collision.disabled = false
 
 	if small_bound_entered and drawing:
@@ -154,19 +162,24 @@ func handle_drawing(event: InputEvent):
 		drawing = false
 		return
 
-	if is_drawing_ccw != null and drawing and not completed and angles.size() > 5:
+	if is_drawing_ccw != null and drawing and not completed and angles.size() > max_angle_array_size:
 		if is_drawing_ccw:  # CCW
-			if curr_relative_angle > 359.7 or curr_relative_angle < 20:
+			if half_revolution_completed and (curr_relative_angle < 45 or curr_relative_angle > 359):
+				revolution_completed = true
+			elif curr_relative_angle > 359.5 or curr_relative_angle < 10:
 				pass
-			elif curr_relative_angle < angles[0]:
+			elif not revolution_completed and curr_relative_angle < angles[-7]:
 				SignalBus.game_lose.emit(Global.LoseMessage.WRONGWAY)
 				similarity_score = 0
 				drawing = false
 				return
 		else:  #CW
-			if curr_relative_angle < 0.3 or curr_relative_angle > 340:
+			if half_revolution_completed and (curr_relative_angle > 315 or curr_relative_angle < 1):
+				revolution_completed = true
+				return
+			elif curr_relative_angle < 0.5 or curr_relative_angle > 350:
 				pass
-			elif curr_relative_angle > angles[0]:
+			elif not revolution_completed and curr_relative_angle > angles[-7]:
 				SignalBus.game_lose.emit(Global.LoseMessage.WRONGWAY)
 				similarity_score = 0
 				drawing = false
@@ -308,11 +321,11 @@ func set_win_area(area_collision: CollisionShape2D, pos: Vector2):
 	else:
 		area_collision.rotation = 0
 	if abs(abs(pos.x) - abs(pos.y)) < 45:
-		collision_size = Vector2(15, 160)
+		collision_size = Vector2(10, 160)
 	elif abs(pos.x) < abs(pos.y):
-		collision_size = Vector2(15, 120)
+		collision_size = Vector2(10, 120)
 	else:
-		collision_size = Vector2(120, 15)
+		collision_size = Vector2(120, 10)
 	area_collision_shape.size = collision_size
 	area_collision.position = pos
 	area_collision.set_shape(area_collision_shape)
