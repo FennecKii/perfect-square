@@ -164,7 +164,7 @@ func handle_drawing(event: InputEvent):
 
 	if is_drawing_ccw != null and drawing and not completed and angles.size() > max_angle_array_size:
 		if is_drawing_ccw:  # CCW
-			if half_revolution_completed and (curr_relative_angle < 45 or curr_relative_angle > 359):
+			if half_revolution_completed and curr_relative_angle < 50 and curr_relative_angle > 1:
 				revolution_completed = true
 			elif curr_relative_angle > 359.5 or curr_relative_angle < 10:
 				pass
@@ -174,7 +174,7 @@ func handle_drawing(event: InputEvent):
 				drawing = false
 				return
 		else:  #CW
-			if half_revolution_completed and (curr_relative_angle > 315 or curr_relative_angle < 1):
+			if half_revolution_completed and curr_relative_angle > 310 and curr_relative_angle < 359:
 				revolution_completed = true
 				return
 			elif curr_relative_angle < 0.5 or curr_relative_angle > 350:
