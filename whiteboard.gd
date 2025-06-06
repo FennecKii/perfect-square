@@ -24,7 +24,7 @@ var big_bound_exited: bool = false
 var small_bound_entered: bool = false
 var bound_collision_delta: Vector2 = Vector2(90, 90)
 var angle_offset: float = 0
-var max_angle_array_size: int = 25
+var max_angle_array_size: int = 10
 var is_drawing_ccw = null
 var curr_relative_angle: float
 var win_con_angle: float
@@ -112,7 +112,7 @@ func handle_drawing(event):
 
 	curr_position = event.position - half_screen_rect + Vector2(0, camera.position.y)
 
-	if angles.size() > 10 and is_drawing_ccw == null:
+	if angles.size() > 7 and is_drawing_ccw == null:
 		if angles[-1] > 10 and angles[-1] < 180:
 			angles = []
 			is_drawing_ccw = true
