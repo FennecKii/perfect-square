@@ -24,7 +24,7 @@ var big_bound_exited: bool = false
 var small_bound_entered: bool = false
 var bound_collision_delta: Vector2 = Vector2(90, 90)
 var angle_offset: float = 0
-var max_angle_array_size: int = 10
+var max_angle_array_size: int = 5
 var is_drawing_ccw = null
 var curr_relative_angle: float
 var win_con_angle: float
@@ -93,10 +93,10 @@ func reset_visuals():
 	SignalBus.reset_ui.emit()
 	queue_redraw()
 
-func handle_drawing(event):
+func handle_drawing(event: InputEvent):
 	if (event is not InputEventMouseButton) and (event is not InputEventMouseMotion):
 		return
-	elif completed and drawing and point_position.size() > 100:
+	elif completed and drawing and point_position.size() > 50:
 		if similarity_score <= highscore:
 			SignalBus.game_win.emit(Global.WinMessage.OLDSCORE, highscore)
 		elif similarity_score > highscore:
@@ -112,15 +112,16 @@ func handle_drawing(event):
 
 	curr_position = event.position - half_screen_rect + Vector2(0, camera.position.y)
 
-	if angles.size() > 7 and is_drawing_ccw == null:
-		if angles[-1] > 10 and angles[-1] < 180:
+	if angles.size() >= max_angle_array_size and is_drawing_ccw == null:
+		if angles[-1] > 5 and angles[-1] < 180:
 			angles = []
 			is_drawing_ccw = true
-			win_area_collision.disabled = false
-		elif angles[-1] < 350 and angles[-1] > 180:
+		elif angles[-1] < 355 and angles[-1] > 180:
 			angles = []
 			is_drawing_ccw = false
-			win_area_collision.disabled = false
+
+	if drawing and curr_relative_angle > 175 and curr_relative_angle < 185:
+		win_area_collision.disabled = false
 
 	if small_bound_entered and drawing:
 		SignalBus.game_lose.emit(Global.LoseMessage.DRAWSQUARE)
@@ -155,7 +156,7 @@ func handle_drawing(event):
 
 	if is_drawing_ccw != null and drawing and not completed and angles.size() > 5:
 		if is_drawing_ccw:  # CCW
-			if curr_relative_angle > 359.7 or curr_relative_angle < 25:
+			if curr_relative_angle > 359.7 or curr_relative_angle < 20:
 				pass
 			elif curr_relative_angle < angles[0]:
 				SignalBus.game_lose.emit(Global.LoseMessage.WRONGWAY)
@@ -163,7 +164,7 @@ func handle_drawing(event):
 				drawing = false
 				return
 		else:  #CW
-			if curr_relative_angle < 0.3 or curr_relative_angle > 335:
+			if curr_relative_angle < 0.3 or curr_relative_angle > 340:
 				pass
 			elif curr_relative_angle > angles[0]:
 				SignalBus.game_lose.emit(Global.LoseMessage.WRONGWAY)
@@ -307,11 +308,11 @@ func set_win_area(area_collision: CollisionShape2D, pos: Vector2):
 	else:
 		area_collision.rotation = 0
 	if abs(abs(pos.x) - abs(pos.y)) < 45:
-		collision_size = Vector2(10, 160)
+		collision_size = Vector2(15, 160)
 	elif abs(pos.x) < abs(pos.y):
-		collision_size = Vector2(10, 120)
+		collision_size = Vector2(15, 120)
 	else:
-		collision_size = Vector2(120, 10)
+		collision_size = Vector2(120, 15)
 	area_collision_shape.size = collision_size
 	area_collision.position = pos
 	area_collision.set_shape(area_collision_shape)
