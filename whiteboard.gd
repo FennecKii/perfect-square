@@ -28,7 +28,6 @@ var max_angle_array_size: int = 30
 var is_drawing_ccw = null
 var curr_relative_angle: float
 var win_con_angle: float
-var revolution_completed: bool = false
 var half_revolution_completed: bool = false
 
 @onready var half_screen_rect = get_viewport_rect().size / 2
@@ -58,9 +57,6 @@ func _process(delta):
 		score_label.add_theme_color_override("font_color", similarity_gradient.sample(similarity_score/100))
 	score_label.text = str(str("%0.2f" % similarity_score,"%")) if similarity_score > 0 else 'X.X%'
 	update_title(delta)
-
-	if revolution_completed:
-		completed = true
 
 func _input(event):
 	handle_drawing(event)
@@ -92,7 +88,6 @@ func reset_game():
 	big_bound_exited = false
 	drawing = false
 	win_area_collision.disabled = true
-	revolution_completed = false
 	half_revolution_completed = false
 
 func reset_visuals():
@@ -165,21 +160,22 @@ func handle_drawing(event: InputEvent):
 	if is_drawing_ccw != null and drawing and not completed and angles.size() > max_angle_array_size:
 		if is_drawing_ccw:  # CCW
 			if half_revolution_completed and curr_relative_angle < 50 and curr_relative_angle > 1:
-				revolution_completed = true
+				completed = true
+				return
 			elif curr_relative_angle > 359.5 or curr_relative_angle < 10:
 				pass
-			elif not revolution_completed and curr_relative_angle < angles[-7]:
+			elif curr_relative_angle < angles[-7]:
 				SignalBus.game_lose.emit(Global.LoseMessage.WRONGWAY)
 				similarity_score = 0
 				drawing = false
 				return
 		else:  #CW
 			if half_revolution_completed and curr_relative_angle > 310 and curr_relative_angle < 359:
-				revolution_completed = true
+				completed = true
 				return
 			elif curr_relative_angle < 0.5 or curr_relative_angle > 350:
 				pass
-			elif not revolution_completed and curr_relative_angle > angles[-7]:
+			elif curr_relative_angle > angles[-7]:
 				SignalBus.game_lose.emit(Global.LoseMessage.WRONGWAY)
 				similarity_score = 0
 				drawing = false
