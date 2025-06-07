@@ -159,7 +159,7 @@ func handle_drawing(event: InputEvent):
 
 	if is_drawing_ccw != null and drawing and not completed and angles.size() > max_angle_array_size:
 		if is_drawing_ccw:  # CCW
-			if half_revolution_completed and curr_relative_angle < 50 and curr_relative_angle > 1:
+			if half_revolution_completed and curr_relative_angle < 80 and curr_relative_angle > 10:
 				completed = true
 				return
 			elif curr_relative_angle > 359.5 or curr_relative_angle < 10:
@@ -170,7 +170,7 @@ func handle_drawing(event: InputEvent):
 				drawing = false
 				return
 		else:  #CW
-			if half_revolution_completed and curr_relative_angle > 310 and curr_relative_angle < 359:
+			if half_revolution_completed and curr_relative_angle > 280 and curr_relative_angle < 350:
 				completed = true
 				return
 			elif curr_relative_angle < 0.5 or curr_relative_angle > 350:
@@ -317,11 +317,11 @@ func set_win_area(area_collision: CollisionShape2D, pos: Vector2):
 	else:
 		area_collision.rotation = 0
 	if abs(abs(pos.x) - abs(pos.y)) < 45:
-		collision_size = Vector2(10, 160)
+		collision_size = Vector2(15, 160)
 	elif abs(pos.x) < abs(pos.y):
-		collision_size = Vector2(10, 120)
+		collision_size = Vector2(15, 120)
 	else:
-		collision_size = Vector2(120, 10)
+		collision_size = Vector2(120, 15)
 	area_collision_shape.size = collision_size
 	area_collision.position = pos
 	area_collision.set_shape(area_collision_shape)
