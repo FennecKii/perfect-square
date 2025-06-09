@@ -41,6 +41,7 @@ var half_revolution_completed: bool = false
 @onready var similarity_gradient = preload("res://similarity_gradient.tres")
 
 func _ready():
+	AudioManager.play_background_music(Global.background_track, -20)
 	queue_redraw()
 	drawing_bound.position = Vector2(-280, -280)
 	drawing_bound.size = Vector2(560, 560)
@@ -224,6 +225,7 @@ func handle_drawing(event: InputEvent):
 			angles.append(curr_relative_angle)
 		else:
 			angles.append(curr_relative_angle)
+		play_progress_sfx()
 		queue_redraw()
 
 func _draw():
@@ -360,3 +362,25 @@ func _calculate_coord_to_relative_degree_map(x, y):
 
 func _on_win_area_mouse_entered() -> void:
 	completed = true
+
+func play_progress_sfx() -> void:
+	if is_drawing_ccw == null:
+		return
+	elif is_drawing_ccw:
+		if curr_relative_angle < 50:
+			AudioManager.play_sfx(Global.progress_sfx, -20, clampf(curr_relative_angle/50, 0.1, 0.5))
+		elif curr_relative_angle < 75:
+			AudioManager.play_sfx(Global.progress_sfx, -20, clampf(curr_relative_angle/75, 0.5, 0.75))
+		elif curr_relative_angle < 100:
+			AudioManager.play_sfx(Global.progress_sfx, -20, clampf(curr_relative_angle/100, 0.75, 1.0))
+		else:
+			AudioManager.play_sfx(Global.progress_sfx, -20, clampf(curr_relative_angle/100, 1.0, 10))
+	elif not is_drawing_ccw:
+		if curr_relative_angle > 310:
+			AudioManager.play_sfx(Global.progress_sfx, -20, clampf(abs(curr_relative_angle-360)/50, 0.1, 0.5))
+		elif curr_relative_angle > 285:
+			AudioManager.play_sfx(Global.progress_sfx, -20, clampf(abs(curr_relative_angle-360)/75, 0.5, 0.75))
+		elif curr_relative_angle > 260:
+			AudioManager.play_sfx(Global.progress_sfx, -20, clampf(abs(curr_relative_angle-360)/100, 0.75, 1.0))
+		else:
+			AudioManager.play_sfx(Global.progress_sfx, -20, clampf(abs(curr_relative_angle-360)/100, 1.0, 10))

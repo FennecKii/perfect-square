@@ -18,6 +18,7 @@ func _on_game_reset():
 	game_start_label.visible = false
 
 func _on_game_lose(type: int):
+	AudioManager.play_sfx(Global.lose_sfx, 7, 1, 0.15)
 	lose_label.visible = true
 	game_start_label.visible = false
 	match type:
@@ -40,5 +41,15 @@ func _on_game_win(type: int, score: float):
 			win_label.add_theme_color_override("font_color", Color.DODGER_BLUE)
 			win_label.text = "Best Score: " + str("%0.2f" % score,"%")
 		Global.WinMessage.HIGHSCORE:
+			if score < 70:
+				AudioManager.play_sfx(Global.highscore_sfx, 2, 0.8)
+			elif score < 80:
+				AudioManager.play_sfx(Global.highscore_sfx, 2.3, 0.9)
+			elif score < 90:
+				AudioManager.play_sfx(Global.highscore_sfx, 2.7, 1.05)
+			elif score < 95:
+				AudioManager.play_sfx(Global.highscore_sfx, 3.2, 1.2)
+			elif score < 100:
+				AudioManager.play_sfx(Global.highscore_sfx, 4, 1.35)
 			win_label.add_theme_color_override("font_color", similarity_gradient.sample(score/100))
 			win_label.text = "New Highscore: " + str("%0.2f" % score,"%")
