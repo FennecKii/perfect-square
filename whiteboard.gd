@@ -29,6 +29,7 @@ var is_drawing_ccw = null
 var curr_relative_angle: float
 var win_con_angle: float
 var half_revolution_completed: bool = false
+var mouse_settings_entered: bool = false
 
 @onready var half_screen_rect = get_viewport_rect().size / 2
 @onready var score_label = $Score
@@ -39,8 +40,11 @@ var half_revolution_completed: bool = false
 @onready var big_bound_collision: CollisionShape2D = $"Big Area Bounds/Bound Collision"
 @onready var boundary_stylebox = preload("res://stylebox_boundary.tres")
 @onready var similarity_gradient = preload("res://similarity_gradient.tres")
+@onready var settings: Control = $Settings
+@onready var settings_button: Button = $"Settings Button"
 
 func _ready():
+	SignalBus.settings_closed.connect(_on_settings_closed)
 	AudioManager.play_background_music(Global.background_track, -20)
 	queue_redraw()
 	drawing_bound.position = Vector2(-280, -280)
@@ -97,6 +101,8 @@ func reset_visuals():
 	queue_redraw()
 
 func handle_drawing(event: InputEvent):
+	if mouse_settings_entered:
+		return
 	if (event is not InputEventMouseButton) and (event is not InputEventMouseMotion):
 		return
 	elif completed and drawing and point_position.size() > 50:
@@ -384,3 +390,18 @@ func play_progress_sfx() -> void:
 			AudioManager.play_sfx(Global.progress_sfx, -20, clampf(abs(curr_relative_angle-360)/100, 0.75, 1.0))
 		else:
 			AudioManager.play_sfx(Global.progress_sfx, -20, clampf(abs(curr_relative_angle-360)/100, 1.0, 10))
+
+func _on_setting_pressed() -> void:
+	settings.visible = true
+	settings_button.visible = false
+	process_mode = Node.PROCESS_MODE_DISABLED
+
+func _on_settings_closed() -> void:
+	settings_button.visible = true
+	process_mode = Node.PROCESS_MODE_INHERIT
+
+func _on_settings_button_mouse_entered() -> void:
+	mouse_settings_entered = true
+
+func _on_settings_button_mouse_exited() -> void:
+	mouse_settings_entered = false

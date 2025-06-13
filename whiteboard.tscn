@@ -1,9 +1,10 @@
-[gd_scene load_steps=8 format=3 uid="uid://cj881scupmcst"]
+[gd_scene load_steps=9 format=3 uid="uid://cj881scupmcst"]
 
 [ext_resource type="Script" uid="uid://dveesddjx3uhj" path="res://whiteboard.gd" id="1_ihy0m"]
 [ext_resource type="Curve" uid="uid://de73cvwww280o" path="res://distrance_curve.tres" id="2_tyhvn"]
 [ext_resource type="Theme" uid="uid://bcb6jx2yuewkc" path="res://ui_default_theme.tres" id="3_c7jcs"]
 [ext_resource type="PackedScene" uid="uid://31catl2ugpea" path="res://ui.tscn" id="4_4ykqq"]
+[ext_resource type="PackedScene" uid="uid://drjvtf077me18" path="res://settings.tscn" id="5_qxae8"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_4ykqq"]
 
@@ -32,6 +33,14 @@ size_flags_horizontal = 4
 size_flags_vertical = 4
 mouse_filter = 2
 color = Color(0.798379, 0.751615, 0.990152, 1)
+
+[node name="Settings Button" type="Button" parent="."]
+offset_left = 469.0
+offset_top = -310.0
+offset_right = 523.0
+offset_bottom = -265.0
+theme = ExtResource("3_c7jcs")
+text = "| |"
 
 [node name="Camera" type="Camera2D" parent="."]
 position = Vector2(0, -25)
@@ -84,6 +93,20 @@ shape = SubResource("RectangleShape2D_qxae8")
 [node name="Bound Collision" type="CollisionShape2D" parent="Big Area Bounds"]
 shape = SubResource("RectangleShape2D_5b0t2")
 
+[node name="Settings" parent="." instance=ExtResource("5_qxae8")]
+visible = false
+
+[node name="X" parent="Settings" index="1"]
+offset_left = 469.0
+offset_top = -310.0
+offset_right = 523.0
+offset_bottom = -265.0
+
+[connection signal="mouse_entered" from="Settings Button" to="." method="_on_settings_button_mouse_entered"]
+[connection signal="mouse_exited" from="Settings Button" to="." method="_on_settings_button_mouse_exited"]
+[connection signal="pressed" from="Settings Button" to="." method="_on_setting_pressed"]
 [connection signal="mouse_entered" from="Win Area" to="." method="_on_win_area_mouse_entered"]
 [connection signal="mouse_entered" from="Small Area Bounds" to="." method="_on_small_area_bounds_mouse_entered"]
 [connection signal="mouse_exited" from="Big Area Bounds" to="." method="_on_big_area_bounds_mouse_exited"]
+
+[editable path="Settings"]
