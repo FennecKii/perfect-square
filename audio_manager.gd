@@ -9,6 +9,7 @@ func play_background_music(music_track: AudioStreamWAV, volume: float = 0.0, pit
 	background_music.stream.loop_mode = AudioStreamWAV.LoopMode.LOOP_FORWARD
 	background_music.stream.loop_begin = 0 * music_track.mix_rate
 	background_music.stream.loop_end = music_track.get_length() * music_track.mix_rate
+	background_music.bus = "Music"
 	background_music.play()
 
 func stop_background_music() -> void:
