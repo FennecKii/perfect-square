@@ -45,7 +45,6 @@ var mouse_settings_entered: bool = false
 
 func _ready():
 	SignalBus.settings_closed.connect(_on_settings_closed)
-	AudioManager.play_background_music(Global.background_track, -20)
 	queue_redraw()
 	drawing_bound.position = Vector2(-280, -280)
 	drawing_bound.size = Vector2(560, 560)
