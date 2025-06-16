@@ -6,7 +6,8 @@
 bg_color = Color(0.833635, 0.772137, 0.917667, 0.690196)
 
 [resource]
-Button/font_sizes/font_size = 24
+Button/constants/outline_size = 12
+Button/font_sizes/font_size = 28
 Button/fonts/font = ExtResource("1_p835c")
 Label/colors/font_color = Color(1, 1, 1, 1)
 Label/colors/font_outline_color = Color(0, 0, 0, 1)
