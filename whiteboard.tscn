@@ -99,11 +99,16 @@ visible = false
 offset_top = -10.0
 offset_bottom = -10.0
 
+[node name="TimeoutTimer" type="Timer" parent="."]
+wait_time = 3.8
+one_shot = true
+
 [connection signal="mouse_entered" from="Settings Button" to="." method="_on_settings_button_mouse_entered"]
 [connection signal="mouse_exited" from="Settings Button" to="." method="_on_settings_button_mouse_exited"]
 [connection signal="pressed" from="Settings Button" to="." method="_on_setting_pressed"]
 [connection signal="mouse_entered" from="Win Area" to="." method="_on_win_area_mouse_entered"]
 [connection signal="mouse_entered" from="Small Area Bounds" to="." method="_on_small_area_bounds_mouse_entered"]
 [connection signal="mouse_exited" from="Big Area Bounds" to="." method="_on_big_area_bounds_mouse_exited"]
+[connection signal="timeout" from="TimeoutTimer" to="." method="_on_timeout_timer_timeout"]
 
 [editable path="Settings"]

@@ -61,6 +61,12 @@ func _process(delta):
 		score_label.add_theme_color_override("font_color", similarity_gradient.sample(similarity_score/100))
 	score_label.text = str(str("%0.2f" % similarity_score,"%")) if similarity_score > 0 else 'X.X%'
 	update_title(delta)
+	
+	if drawing and $TimeoutTimer.time_left == 0:
+		SignalBus.game_lose.emit(Global.LoseMessage.TIMEOUT)
+		similarity_score = 0
+		drawing = false
+		return
 
 func _input(event):
 	handle_drawing(event)
@@ -93,6 +99,7 @@ func reset_game():
 	drawing = false
 	win_area_collision.disabled = true
 	half_revolution_completed = false
+	$TimeoutTimer.start()
 
 func reset_visuals():
 	similarity_score = 0
@@ -132,12 +139,7 @@ func handle_drawing(event: InputEvent):
 		half_revolution_completed = true
 		win_area_collision.disabled = false
 
-	if small_bound_entered and drawing:
-		SignalBus.game_lose.emit(Global.LoseMessage.DRAWSQUARE)
-		similarity_score = 0
-		drawing = false
-		return
-	elif big_bound_exited and drawing:
+	if drawing and (small_bound_entered or big_bound_exited):
 		SignalBus.game_lose.emit(Global.LoseMessage.DRAWSQUARE)
 		similarity_score = 0
 		drawing = false

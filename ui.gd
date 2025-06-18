@@ -35,6 +35,8 @@ func _on_game_lose(type: int):
 			lose_label.text = "Out of Bounds..."
 		Global.LoseMessage.TOOSMALL:
 			lose_label.text = "Square Too Small!"
+		Global.LoseMessage.TIMEOUT:
+			lose_label.text = "Drawing Too Slow!"
 
 func _on_game_win(type: int, score: float):
 	win_label.visible = true

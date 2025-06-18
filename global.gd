@@ -5,7 +5,8 @@ enum LoseMessage {
 	WRONGWAY,
 	DRAWSQUARE,
 	OUTBOUNDS,
-	TOOSMALL
+	TOOSMALL,
+	TIMEOUT
 	}
 
 enum WinMessage {
