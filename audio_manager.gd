@@ -3,6 +3,8 @@ extends Node
 @onready var background_music: AudioStreamPlayer = $"Background Music"
 
 func play_background_music(music_track: AudioStreamWAV, volume: float = 0.0, pitch: float = 1.0) -> void:
+	if background_music.stream != null:
+		return
 	background_music.stream = music_track
 	background_music.volume_db = volume
 	background_music.pitch_scale = pitch
@@ -11,9 +13,6 @@ func play_background_music(music_track: AudioStreamWAV, volume: float = 0.0, pit
 	background_music.stream.loop_end = music_track.get_length() * music_track.mix_rate
 	background_music.bus = "Music"
 	background_music.play()
-
-func stop_background_music() -> void:
-	background_music.stop()
 
 func play_sfx(sfx_stream: AudioStream, volume: float = 0.0, pitch: float = 1.0, pitch_randomness: float = 0.0):
 	var new_sfx = AudioStreamPlayer2D.new()

@@ -27,9 +27,12 @@ func _on_game_lose(type: int):
 		Global.LoseMessage.WRONGWAY:
 			lose_label.text = "Wrong Way!"
 		Global.LoseMessage.DRAWSQUARE:
-			lose_label.text = "Stay on Track!"
+			if randi_range(1, 2) == 1:
+				lose_label.text = "Stay on Track!"
+			else:
+				lose_label.text = "Please Draw A Square..."
 		Global.LoseMessage.OUTBOUNDS:
-			lose_label.text = "Out of Bounds!"
+			lose_label.text = "Out of Bounds..."
 		Global.LoseMessage.TOOSMALL:
 			lose_label.text = "Square Too Small!"
 

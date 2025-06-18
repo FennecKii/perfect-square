@@ -1,8 +1,7 @@
-[gd_scene load_steps=5 format=3 uid="uid://drjvtf077me18"]
+[gd_scene load_steps=4 format=3 uid="uid://drjvtf077me18"]
 
 [ext_resource type="Theme" uid="uid://bcb6jx2yuewkc" path="res://ui_default_theme.tres" id="1_nkug2"]
 [ext_resource type="Script" uid="uid://dy3whtjcw25a7" path="res://settings.gd" id="2_nkug2"]
-[ext_resource type="StyleBox" uid="uid://cng5ergcot20w" path="res://invisible_button_style.tres" id="3_3ykye"]
 [ext_resource type="Script" uid="uid://8m8loyfv40cj" path="res://volume_slider.gd" id="3_gc0em"]
 
 [node name="Settings" type="Control"]
@@ -31,14 +30,51 @@ grow_horizontal = 2
 grow_vertical = 2
 
 [node name="Panel" type="Panel" parent="CenterContainer"]
-custom_minimum_size = Vector2(1500, 1000)
+custom_minimum_size = Vector2(200, 375)
 layout_mode = 2
+
+[node name="CenterContainer2" type="CenterContainer" parent="CenterContainer/Panel"]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -74.5
+offset_top = -70.26
+offset_right = 74.5
+offset_bottom = -30.26
+grow_horizontal = 2
+grow_vertical = 0
+
+[node name="Buttons" type="HBoxContainer" parent="CenterContainer/Panel/CenterContainer2"]
+layout_mode = 2
+
+[node name="X" type="Button" parent="CenterContainer/Panel/CenterContainer2/Buttons"]
+custom_minimum_size = Vector2(70, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "Close"
+
+[node name="Control" type="Control" parent="CenterContainer/Panel/CenterContainer2/Buttons"]
+custom_minimum_size = Vector2(10, 0)
+layout_mode = 2
+
+[node name="Menu" type="Button" parent="CenterContainer/Panel/CenterContainer2/Buttons"]
+custom_minimum_size = Vector2(70, 0)
+layout_mode = 2
+theme_override_font_sizes/font_size = 28
+text = "Menu
+"
 
 [node name="CenterContainer" type="CenterContainer" parent="CenterContainer/Panel"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
+offset_top = 10.0
+offset_right = 1.0
+offset_bottom = -90.0
 grow_horizontal = 2
 grow_vertical = 2
 
@@ -47,9 +83,14 @@ layout_mode = 2
 
 [node name="Label" type="Label" parent="CenterContainer/Panel/CenterContainer/VBoxContainer"]
 layout_mode = 2
+theme_override_font_sizes/font_size = 36
 text = "Settings"
 horizontal_alignment = 1
 vertical_alignment = 1
+
+[node name="Control" type="Control" parent="CenterContainer/Panel/CenterContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 20)
+layout_mode = 2
 
 [node name="Label4" type="Label" parent="CenterContainer/Panel/CenterContainer/VBoxContainer"]
 layout_mode = 2
@@ -90,24 +131,5 @@ step = 0.1
 script = ExtResource("3_gc0em")
 bus_name = "SFX"
 
-[node name="X" type="Button" parent="."]
-layout_mode = 1
-anchors_preset = 1
-anchor_left = 1.0
-anchor_right = 1.0
-offset_left = -86.0
-offset_top = 26.0
-offset_right = -32.0
-offset_bottom = 71.0
-grow_horizontal = 0
-theme_override_constants/outline_size = 8
-theme_override_font_sizes/font_size = 32
-theme_override_styles/focus = ExtResource("3_3ykye")
-theme_override_styles/disabled = ExtResource("3_3ykye")
-theme_override_styles/hover_pressed = ExtResource("3_3ykye")
-theme_override_styles/hover = ExtResource("3_3ykye")
-theme_override_styles/pressed = ExtResource("3_3ykye")
-theme_override_styles/normal = ExtResource("3_3ykye")
-text = "X"
-
-[connection signal="pressed" from="X" to="." method="_on_x_pressed"]
+[connection signal="pressed" from="CenterContainer/Panel/CenterContainer2/Buttons/X" to="." method="_on_x_pressed"]
+[connection signal="pressed" from="CenterContainer/Panel/CenterContainer2/Buttons/Menu" to="." method="_on_menu_pressed"]
