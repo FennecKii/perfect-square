@@ -61,7 +61,7 @@ func _process(delta):
 		score_label.add_theme_color_override("font_color", similarity_gradient.sample(similarity_score/100))
 	score_label.text = str(str("%0.2f" % similarity_score,"%")) if similarity_score > 0 else 'X.X%'
 	update_title(delta)
-	
+
 	if drawing and $TimeoutTimer.time_left == 0:
 		SignalBus.game_lose.emit(Global.LoseMessage.TIMEOUT)
 		similarity_score = 0
@@ -377,22 +377,23 @@ func play_progress_sfx() -> void:
 		if curr_relative_angle < 50:
 			AudioManager.play_sfx(Global.progress_sfx, -20, clampf(curr_relative_angle/50, 0.1, 0.5))
 		elif curr_relative_angle < 75:
-			AudioManager.play_sfx(Global.progress_sfx, -20, clampf(curr_relative_angle/75, 0.5, 0.75))
+			AudioManager.play_sfx(Global.progress_sfx, -21, clampf(curr_relative_angle/75, 0.5, 0.75))
 		elif curr_relative_angle < 100:
-			AudioManager.play_sfx(Global.progress_sfx, -20, clampf(curr_relative_angle/100, 0.75, 1.0))
+			AudioManager.play_sfx(Global.progress_sfx, -22, clampf(curr_relative_angle/100, 0.75, 1.0))
 		else:
-			AudioManager.play_sfx(Global.progress_sfx, -20, clampf(curr_relative_angle/100, 1.0, 10))
+			AudioManager.play_sfx(Global.progress_sfx, -22, clampf(curr_relative_angle/100, 1.0, 10))
 	elif not is_drawing_ccw:
 		if curr_relative_angle > 310:
 			AudioManager.play_sfx(Global.progress_sfx, -20, clampf(abs(curr_relative_angle-360)/50, 0.1, 0.5))
 		elif curr_relative_angle > 285:
-			AudioManager.play_sfx(Global.progress_sfx, -20, clampf(abs(curr_relative_angle-360)/75, 0.5, 0.75))
+			AudioManager.play_sfx(Global.progress_sfx, -21, clampf(abs(curr_relative_angle-360)/75, 0.5, 0.75))
 		elif curr_relative_angle > 260:
-			AudioManager.play_sfx(Global.progress_sfx, -20, clampf(abs(curr_relative_angle-360)/100, 0.75, 1.0))
+			AudioManager.play_sfx(Global.progress_sfx, -22, clampf(abs(curr_relative_angle-360)/100, 0.75, 1.0))
 		else:
-			AudioManager.play_sfx(Global.progress_sfx, -20, clampf(abs(curr_relative_angle-360)/100, 1.0, 10))
+			AudioManager.play_sfx(Global.progress_sfx, -22, clampf(abs(curr_relative_angle-360)/100, 1.0, 10))
 
 func _on_setting_pressed() -> void:
+	AudioManager.play_sfx(Global.button_press_sfx, Global.button_press_volume, Global.button_press_pitch, Global.button_press_pitch_variation)
 	settings.visible = true
 	settings_button.visible = false
 	process_mode = Node.PROCESS_MODE_DISABLED

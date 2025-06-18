@@ -101,7 +101,7 @@ vertical_alignment = 1
 [node name="MasterVolumeSlider" type="HSlider" parent="CenterContainer/Panel/CenterContainer/VBoxContainer"]
 layout_mode = 2
 max_value = 10.0
-step = 0.1
+step = 0.5
 script = ExtResource("3_gc0em")
 bus_name = "Master"
 
@@ -114,7 +114,7 @@ vertical_alignment = 1
 [node name="MusicVolumeSlider" type="HSlider" parent="CenterContainer/Panel/CenterContainer/VBoxContainer"]
 layout_mode = 2
 max_value = 10.0
-step = 0.1
+step = 0.5
 script = ExtResource("3_gc0em")
 bus_name = "Music"
 
@@ -127,9 +127,11 @@ vertical_alignment = 1
 [node name="SFXVolumeSlider" type="HSlider" parent="CenterContainer/Panel/CenterContainer/VBoxContainer"]
 layout_mode = 2
 max_value = 5.0
-step = 0.1
+step = 0.25
 script = ExtResource("3_gc0em")
 bus_name = "SFX"
 
 [connection signal="pressed" from="CenterContainer/Panel/CenterContainer2/Buttons/X" to="." method="_on_x_pressed"]
+[connection signal="pressed" from="CenterContainer/Panel/CenterContainer2/Buttons/X" to="." method="_on_button_pressed"]
 [connection signal="pressed" from="CenterContainer/Panel/CenterContainer2/Buttons/Menu" to="." method="_on_menu_pressed"]
+[connection signal="pressed" from="CenterContainer/Panel/CenterContainer2/Buttons/Menu" to="." method="_on_button_pressed"]
